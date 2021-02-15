@@ -1,0 +1,9 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const joi_1 = require("joi");
+exports.default = joi_1.object({
+    email: joi_1.string()
+        .email()
+        .required(),
+}).options({ abortEarly: false });
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiUGFzc3dvcmRSZXNldENvbmZpcm1hdGlvblNjaGVtYS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9zY2hlbWFzL1Bhc3N3b3JkUmVzZXRDb25maXJtYXRpb25TY2hlbWEudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7QUFBQSw2QkFBcUM7QUFFckMsa0JBQWUsWUFBTSxDQUFDO0lBQ2xCLEtBQUssRUFBRSxZQUFNLEVBQUU7U0FDVixLQUFLLEVBQUU7U0FDUCxRQUFRLEVBQUU7Q0FDbEIsQ0FBQyxDQUFDLE9BQU8sQ0FBQyxFQUFFLFVBQVUsRUFBRSxLQUFLLEVBQUUsQ0FBQyxDQUFDIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgb2JqZWN0LCBzdHJpbmcgfSBmcm9tICdqb2knO1xyXG5cclxuZXhwb3J0IGRlZmF1bHQgb2JqZWN0KHtcclxuICAgIGVtYWlsOiBzdHJpbmcoKVxyXG4gICAgICAgIC5lbWFpbCgpXHJcbiAgICAgICAgLnJlcXVpcmVkKCksXHJcbn0pLm9wdGlvbnMoeyBhYm9ydEVhcmx5OiBmYWxzZSB9KTtcclxuIl19

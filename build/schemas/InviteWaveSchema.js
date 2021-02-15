@@ -1,0 +1,8 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const joi_1 = require("joi");
+exports.default = joi_1.object({
+    amount: joi_1.number()
+        .required(),
+}).options({ abortEarly: false });
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiSW52aXRlV2F2ZVNjaGVtYS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9zY2hlbWFzL0ludml0ZVdhdmVTY2hlbWEudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7QUFBQSw2QkFBbUM7QUFFbkMsa0JBQWUsWUFBTSxDQUFDO0lBQ2xCLE1BQU0sRUFBRSxZQUFNLEVBQUU7U0FDWCxRQUFRLEVBQUU7Q0FDbEIsQ0FBQyxDQUFDLE9BQU8sQ0FBQyxFQUFFLFVBQVUsRUFBRSxLQUFLLEVBQUUsQ0FBQyxDQUFDIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHtvYmplY3QsIG51bWJlcn0gZnJvbSAnam9pJztcclxuXHJcbmV4cG9ydCBkZWZhdWx0IG9iamVjdCh7XHJcbiAgICBhbW91bnQ6IG51bWJlcigpXHJcbiAgICAgICAgLnJlcXVpcmVkKCksXHJcbn0pLm9wdGlvbnMoeyBhYm9ydEVhcmx5OiBmYWxzZSB9KTtcclxuIl19
