@@ -67,7 +67,7 @@ export default new class CloudflareUtil {
         await this.request(`/zones/${id}/dns_records`, 'POST', {
             type: 'CNAME',
             name: '@',
-            content: 'i.dny.wtf',
+            content: 'i.clippy.gg',
             ttl: 1,
             proxied: true,
         });
