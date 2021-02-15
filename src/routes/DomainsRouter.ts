@@ -58,9 +58,9 @@ router.post('/', AdminMiddleware, ValidationMiddleware(DomainSchema), async (req
             });
             if(name.endsWith(".tk") || name.endsWith(".ml") || name.endsWith(".ga") || name.endsWith(".cf") || name.endsWith(".gq"))return res.status(401).json({
                 success: false,
-                error: 'dny is currently not accepting free domains',
+                error: 'clippy is currently not accepting free domains',
             });
-            if(name.startsWith("http"))return res.status(401).json({
+            if(name.startsWith("http")) return res.status(401).json({
                 success: false,
                 error: 'please enter domains in the right format',
             });
@@ -103,9 +103,9 @@ router.post('/custom', AuthMiddleware, ValidationMiddleware(CustomDomainSchema),
     });
     if(name.endsWith(".tk") || name.endsWith(".ml") || name.endsWith(".ga") || name.endsWith(".cf") || name.endsWith(".gq"))return res.status(401).json({
         success: false,
-        error: 'dny is currently not accepting free domains',
+        error: 'clippy is currently not accepting free domains',
     });
-    if(name.startsWith("http"))return res.status(401).json({
+    if(name.startsWith("http")) return res.status(401).json({
         success: false,
         error: 'please enter domains in the right format',
     });
@@ -179,7 +179,7 @@ router.delete('/:name', AdminMiddleware, async (req: Request, res: Response) => 
         await domain.remove();
 
         await UserModel.updateMany({ 'settings.domain.name': domain.name }, {
-            'settings.domain.name': 'i.dny.wtf',
+            'settings.domain.name': 'i.clippy.gg',
             'settings.domain.subdomain': null,
         });
 
