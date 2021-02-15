@@ -145,7 +145,7 @@ router.get('/config', ValidationMiddleware(ConfigSchema, 'query'), async (req: R
     });
 
     const config = {
-        Name: 'dny.wtf shortener',
+        Name: 'clippy.gg shortener',
         DestinationType: 'URLShortener',
         RequestMethod: 'POST',
         RequestURL: `${process.env.BACKEND_URL}/shortener`,
@@ -159,7 +159,7 @@ router.get('/config', ValidationMiddleware(ConfigSchema, 'query'), async (req: R
         ErrorMessage: '$json:error$',
     };
 
-    res.set('Content-Disposition', 'attachment; filename=dnyshortener.sxcu');
+    res.set('Content-Disposition', 'attachment; filename=clippy.gg-shortener.sxcu');
     res.send(Buffer.from(JSON.stringify(config, null, 2), 'utf8'));
 });
 
