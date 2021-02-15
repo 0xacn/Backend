@@ -266,10 +266,10 @@ router.get('/config', ValidationMiddleware(ConfigSchema, 'query'), async (req: R
     });
 
     const config = {
-        Name: 'dny.wtf file uploader',
+        Name: 'clippy.gg file uploader',
         DestinationType: 'ImageUploader, FileUploader',
         RequestType: 'POST',
-        RequestURL: `https://api.dny.wtf/files`,
+        RequestURL: `https://api.clippy.gg/files`,
         FileFormName: 'file',
         Body: 'MultipartFormData',
         Headers: {
@@ -280,7 +280,7 @@ router.get('/config', ValidationMiddleware(ConfigSchema, 'query'), async (req: R
         ErrorMessage: '$json:error$',
     };
 
-    res.set('Content-Disposition', 'attachment; filename=dny.wtf.sxcu');
+    res.set('Content-Disposition', 'attachment; filename=clippy.gg.sxcu');
     res.send(Buffer.from(JSON.stringify(config, null, 2), 'utf8'));
 });
 
