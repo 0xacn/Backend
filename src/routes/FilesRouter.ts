@@ -269,7 +269,7 @@ router.get('/config', ValidationMiddleware(ConfigSchema, 'query'), async (req: R
         Name: 'clippy.gg file uploader',
         DestinationType: 'ImageUploader, FileUploader',
         RequestType: 'POST',
-        RequestURL: `https://api.clippy.gg/files`,
+        RequestURL: `https://clippy.gg/api/files`,
         FileFormName: 'file',
         Body: 'MultipartFormData',
         Headers: {
