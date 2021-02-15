@@ -23,7 +23,7 @@ const transporter = nodemailer.createTransport({
 async function sendVerificationEmail(user: User) {
     try {
         const html = `<h1>Email Verification</h1>
-        Thank you for registering on <a href="https://clippy.gg">Dny</a>, <strong>${user.username}</strong>.<br>
+        Thank you for registering on <a href="https://clippy.gg">clippy</a>, <strong>${user.username}</strong>.<br>
         Please confirm your email with the link below to complete the registration process.<br><br>
         ${process.env.BACKEND_URL}/auth/verify?key=${user.emailVerificationKey}`;
 
