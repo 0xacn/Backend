@@ -36,7 +36,7 @@ router.post('/', AuthMiddleware, async (req: Request, res: Response) => {
 
     res.status(200).json({
         success: true,
-        link: `https://dny.wtf/?code=${invite}`,
+        link: `https://clippy.gg/?code=${invite}`,
         code: invite,
         dateCreated,
     });
