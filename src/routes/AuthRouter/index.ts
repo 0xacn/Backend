@@ -213,7 +213,7 @@ router.post('/register', ValidationMiddleware(RegisterSchema), async (req: Reque
             notifications: [],
             settings: {
                 domain: {
-                    name: 'i.dny.wtf',
+                    name: 'i.clippy.gg',
                     subdomain: null,
                 },
                 randomDomain: {
