@@ -32,6 +32,7 @@
     "@types/ms": "^0.7.31",
     "@types/multer": "^1.4.4",
     "@types/multer-s3": "^2.7.8",
+    "@types/nodemailer": "^6.4.0",
     "archiver": "^5.1.0",
     "argon2": "^0.27.0",
     "aws-sdk": "^2.799.0",
