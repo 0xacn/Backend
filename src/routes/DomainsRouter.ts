@@ -9,6 +9,7 @@ import DomainSchema from '../schemas/DomainSchema';
 import CloudflareUtil from '../utils/CloudflareUtil';
 import { logCustomDomain, logDomains } from '../utils/LoggingUtil';
 import AdminAuthMiddleware from "../middlewares/AdminAuthMiddleware";
+import isValidDomain from 'is-valid-domain';
 const router = Router();
 
 router.get('/', AdminAuthMiddleware, async (req: Request, res: Response) => {
@@ -56,14 +57,22 @@ router.post('/', AdminMiddleware, ValidationMiddleware(DomainSchema), async (req
                 success: false,
                 error: `${name} already exists`,
             });
-            if(name.endsWith(".tk") || name.endsWith(".ml") || name.endsWith(".ga") || name.endsWith(".cf") || name.endsWith(".gq"))return res.status(401).json({
+
+            if (name.endsWith(".tk") || name.endsWith(".ml") || name.endsWith(".ga") || name.endsWith(".cf") || name.endsWith(".gq")) return res.status(401).json({
                 success: false,
                 error: 'clippy is currently not accepting free domains',
             });
-            if(name.startsWith("http")) return res.status(401).json({
+
+            if (name.startsWith("http")) return res.status(401).json({
                 success: false,
                 error: 'please enter domains in the right format',
             });
+
+            if (!isValidDomain(name)) return res.status(401).json({
+                success: false,
+                error: 'domain isn\'t formatted correctly'
+            });
+
             if (user && userOnly && !donatedBy) donatedBy = user._id;
 
             await CloudflareUtil.addDomain(name, wildcard).catch((e) => console.log(e));
