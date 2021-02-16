@@ -149,6 +149,12 @@ export class User {
     invitedUsers: string[];
 
     /**
+     * The users that the user invited.
+     */
+    @prop({ type: () => [String] })
+    ips: string[];
+
+    /**
      * The date that the user registered.
      */
     @prop()

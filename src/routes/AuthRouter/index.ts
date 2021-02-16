@@ -15,10 +15,7 @@ import PasswordResetsRouter from './PasswordResetsRouter';
 import PasswordResetModel from '../../models/PasswordResetModel';
 import CounterModel from '../../models/CounterModel';
 import RefreshTokenModel from '../../models/RefreshTokenModel';
-import SpamEmails from '../../utils/SpamEmailList.json';
-import emailList from 'disposable-email-domains';
-import wildcardEmailList from 'disposable-email-domains/wildcard.json';
-import { sendVerificationEmail } from '../../utils/MailUtil';
+import {logPossibleAlts} from "../../utils/LoggingUtil";
 const router = Router();
 
 async function getNextUid() {
@@ -59,7 +56,7 @@ router.post('/token', async (req: Request, res: Response) => {
         const token: any = verifyjwt(refreshToken.token, process.env.REFRESH_TOKEN_SECRET);
 
         const user = await UserModel.findOne({ _id: token._id })
-            .select('-__v -password');
+            .select('-__v -password -ips');
 
         if (!user) return res.status(401).json({
             success: false,
@@ -70,7 +67,7 @@ router.post('/token', async (req: Request, res: Response) => {
             lastLogin: new Date(),
         });
 
-        if (!user.settings.fakeUrl) {
+        if(!user.settings.fakeUrl ){
             await UserModel.findByIdAndUpdate(user._id, {
                 settings: {
                     ...user.settings,
@@ -112,7 +109,7 @@ router.post('/register', ValidationMiddleware(RegisterSchema), async (req: Reque
 
     const usernameTaken = await UserModel.findOne({
         username: { $regex: new RegExp(username, 'i') } }
-    );
+        );
 
     if (usernameTaken) return res.status(400).json({
         success: false,
@@ -124,17 +121,6 @@ router.post('/register', ValidationMiddleware(RegisterSchema), async (req: Reque
     if (emailTaken) return res.status(400).json({
         success: false,
         error: 'an account has already been registered with this email',
-    });
-
-    const splitEmail = email.split('@', 2);
-
-    if (
-        emailList.includes(splitEmail[1]) ||
-        wildcardEmailList.includes(splitEmail[1]) ||
-        SpamEmails.includes(splitEmail[1])
-    ) return res.status(400).json({
-        success: false,
-        error: 'email matches spam list, please try again with another email'
     });
 
     const inviteDoc = await InviteModel.findById(invite);
@@ -149,13 +135,29 @@ router.post('/register', ValidationMiddleware(RegisterSchema), async (req: Reque
         error: 'this invite has already been redeemed',
     });
 
+    const ips = await UserModel.find(
+        { ips: req.realIp}
+    );
+    const ipuser = await UserModel.findOne(
+        {
+            ips: req.realIp,
+            'blacklisted.status': true,
+        });
+
+    if(ipuser){
+        return res.status(401).json({
+            success: false,
+            error: `you are blacklisted for a punishment related to ${ipuser.username} for: ${ipuser.blacklisted.reason}`,
+        });
+    }
+
     let invitedBy = 'Admin';
     const inviter = await UserModel.findOne({ _id: inviteDoc.createdBy.uuid });
 
     if (inviter) {
         invitedBy = inviter.username;
 
-        if (inviter.blacklisted.status) {
+        if(inviter.blacklisted.status){
             return res.status(400).json({
                 success: false,
                 error: 'the user you got invited by is banned',
@@ -204,6 +206,7 @@ router.post('/register', ValidationMiddleware(RegisterSchema), async (req: Reque
             invites: 0,
             invitedBy,
             invitedUsers: [],
+            ips: [req.realIp],
             registrationDate: new Date(),
             lastLogin: null,
             admin: false,
@@ -240,14 +243,15 @@ router.post('/register', ValidationMiddleware(RegisterSchema), async (req: Reque
         });
 
         await user.save();
+        if (ips.length >= 1){
+            await logPossibleAlts(ips, user);
+        }
 
-        await sendVerificationEmail(user);
 
         res.status(200).json({
             success: true,
-            message: 'registered successfully, please check your email',
+            message: 'registered successfully, please login',
         });
-
     } catch (err) {
         res.status(500).json({
             success: false,
@@ -278,16 +282,41 @@ router.post('/login', ValidationMiddleware(LoginSchema), async (req: Request, re
         success: false,
         error: `you are blacklisted for: ${user.blacklisted.reason}`,
     });
+    const ipuser = await UserModel.findOne(
+        {
+            ips: req.realIp,
+            username: { $ne: user.username },
+            'blacklisted.status': true,
+        });
+
+    if(ipuser ){
+        return res.status(401).json({
+            success: false,
+            error: `you are blacklisted for a punishment related to ${ipuser.username} for: ${ipuser.blacklisted.reason}`,
+        });
+    }
+
 
     try {
         const passwordReset = await PasswordResetModel.findOne({ user: user._id });
         if (passwordReset) await passwordReset.remove();
 
+        const ips = await UserModel.find(
+            {
+                ips: req.realIp,
+                username: { $ne: user.username }
+            }
+        );
+        if (ips.length >= 1){
+            await logPossibleAlts(ips, user);
+        }
         await UserModel.findByIdAndUpdate(user._id, {
             lastLogin: new Date(),
+            $addToSet : {
+                ips: req.realIp
+            }
         });
-
-        if (!user.settings.fakeUrl) {
+        if(!user.settings.fakeUrl ){
             await UserModel.findByIdAndUpdate(user._id, {
                 settings: {
                     ...user.settings,
