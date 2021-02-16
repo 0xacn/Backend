@@ -513,31 +513,5 @@ router.get('/users/:id', async (req: Request, res: Response) => {
         });
     }
 });
-router.get('/alts/:id', async (req: Request, res: Response) => {
-    const { id } = req.params;
-
-    try {
-        const user = await UserModel.findById(id) || await UserModel.findOne({ username: id }) || await UserModel.findOne({ 'discord.id': id.replace('<@!', '').replace('>', '') }) || await UserModel.findOne({ uid: parseInt(id) || null });
-
-        if (!user) return res.status(404).json({
-            success: false,
-            error: 'invalid user',
-        });
-        let alts = []
-        for (let ip in user.ips){
-            const ips = await UserModel.find({ ips: ip}).select('-__v -password -ips')
-            alts.push(ips);
-        }
-        res.status(200).json({
-            success: true,
-            alts: alts,
-        });
-    } catch (err) {
-        res.status(500).json({
-            success: false,
-            error: err.message,
-        });
-    }
-});
 
 export default router;

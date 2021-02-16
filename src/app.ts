@@ -10,9 +10,8 @@ import {
     AdminRouter
 } from './routes';
 import { connect } from 'mongoose';
-import { transporter } from './utils/MailUtil';
 import { intervals } from './utils/Intervals';
-import {s3, updateStorage, wipeFiles} from './utils/S3Util';
+import { updateStorage, wipeFiles } from './utils/S3Util';
 import express, { json } from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -23,8 +22,6 @@ import ms from 'ms';
 import CounterModel from './models/CounterModel';
 import FileModel from './models/FileModel';
 import InvisibleUrlModel from './models/InvisibleUrlModel';
-const rateLimit = require("express-rate-limit");
-
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -56,7 +53,7 @@ try {
         'DISCORD_ROLES',
         'DISCORD_SERVER_ID',
         'DISCORD_BOT_TOKEN',
-        'GMAIL_PASSWORD'
+        'SENDGRID_API_KEY',
     ];
 
     for (const env of requiredEnvs) {
@@ -74,12 +71,7 @@ try {
         origin: process.env.FRONTEND_URL,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     }));
-    app.use((req, res, next) => {
-        let ip = req.headers['cf-connecting-ip'] as string
-        req.realIp = ip || req.ip
-
-        return next()
-    })
+    
     app.set('trust proxy', 1)
     app.use(helmet.originAgentCluster());
     app.use(helmet.dnsPrefetchControl());
@@ -114,8 +106,6 @@ try {
     });
 
     (async () => {
-        await transporter.verify();
-        console.log("Mail verified")
         const findCounter = await CounterModel.findById('counter');
         if (!findCounter) throw new Error('Create a counter document with the value 1 as the count');
         for (const user of await UserModel.find({ 'settings.autoWipe.enabled': true })) {

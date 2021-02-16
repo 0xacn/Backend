@@ -1,6 +1,5 @@
 import Axios from 'axios';
 import { Domain } from '../models/DomainModel';
-import UserModel, {User} from "../models/UserModel";
 
 /**
  * Log a list of new domains to the domain notifications channel.
@@ -51,57 +50,8 @@ async function logCustomDomain(domain: Domain) {
         ],
     });
 }
-/**
- * Log a possible alt to the discord.
- * @param {User[]} users The users.
- * @param alt
- */
-async function logPossibleAlts(users: User[], alt: User) {
-    const altsList = users.map((d) =>  d.username + (d.blacklisted.status ? ' (Blacklisted)' : '')).join(', ');
-    await Axios.post(process.env.CUSTOM_DOMAIN_WEBHOOK, {
-        embeds: [
-            {
-                title: 'New possible alt detected:',
-                fields: [
-                    {
-                        name: 'Username:',
-                        value: alt.username,
-                        inline: true,
-                    },
-                    {
-                        name: 'UID:',
-                        value: `${alt.uid}`,
-                        inline: true,
-                    },
-                    {
-                        name: 'Uploads:',
-                        value: alt.uploads,
-                        inline: true
-                    },
-                    {
-                        name: 'Discord:',
-                        value: alt.discord.id ? `<@${alt.discord.id}>` : 'Not linked',
-                        inline: true
-                    },
-                    {
-                        name: 'Relative accounts:',
-                        value: `\`\`\`${altsList}\`\`\``
-                    },
-                    {
-                        name: 'UUID:',
-                        value: `\`\`\`${alt._id}\`\`\``
-                    },
-                ],
-                thumbnail:{
-                    url: alt.discord.avatar
-                }
-            },
-        ],
-    });
-}
 
 export {
     logDomains,
     logCustomDomain,
-    logPossibleAlts
 };
