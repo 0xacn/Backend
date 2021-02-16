@@ -110,13 +110,20 @@ router.post('/custom', AuthMiddleware, ValidationMiddleware(CustomDomainSchema),
         success: false,
         error: 'you do not have permission to add custom domains',
     });
-    if(name.endsWith(".tk") || name.endsWith(".ml") || name.endsWith(".ga") || name.endsWith(".cf") || name.endsWith(".gq"))return res.status(401).json({
+    
+    if (name.endsWith(".tk") || name.endsWith(".ml") || name.endsWith(".ga") || name.endsWith(".cf") || name.endsWith(".gq"))return res.status(401).json({
         success: false,
         error: 'clippy is currently not accepting free domains',
     });
-    if(name.startsWith("http")) return res.status(401).json({
+    
+    if (name.startsWith("http")) return res.status(401).json({
         success: false,
         error: 'please enter domains in the right format',
+    });
+    
+    if (!isValidDomain(name)) return res.status(401).json({
+        success: false,
+        error: 'domain isn\'t formatted correctly'
     });
 
     try {
