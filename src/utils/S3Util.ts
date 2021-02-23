@@ -7,20 +7,12 @@ import Axios, {Method} from "axios";
 /**
  * The aws-S3 session.
  */
-// const s3 = new S3({
-//     credentials: {
-//         secretAccessKey: process.env.S3_SECRET_KEY,
-//         accessKeyId: process.env.S3_ACCESS_KEY_ID,
-//     },
-//     endpoint: process.env.S3_ENDPOINT,
-// });
-//minio s3 lol
-var s3  = new S3({
-    accessKeyId: process.env.S3_ACCESS_KEY_ID ,
-    secretAccessKey: process.env.S3_SECRET_KEY,
-    endpoint: process.env.S3_ENDPOINT ,
-    s3ForcePathStyle: true, // needed with minio?
-    signatureVersion: 'v4'
+const s3 = new S3({
+    credentials: {
+        secretAccessKey: process.env.S3_SECRET_KEY,
+        accessKeyId: process.env.S3_ACCESS_KEY_ID,
+    },
+    endpoint: process.env.S3_ENDPOINT,
 });
 
 // the function below is terrible, disgusting, and long, I know, I couldn't really think of any either way to do it and I wanted to release quickly, sorry!
@@ -44,6 +36,7 @@ async function updateStorage() {
         new Error(err)
     }
 }
+
 async function request(endpoint: string, method: Method, body?: object | string, headers?: object){
     try {
         const baseUrl = 'https://discord.com/api/v8';
