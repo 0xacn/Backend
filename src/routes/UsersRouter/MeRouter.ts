@@ -26,53 +26,24 @@ router.get('/', async (req: Request, res: Response) => {
 
 router.get('/images', async (req: Request, res: Response) => {
     const { user } = req;
-    const domains = await DomainModel.find({ userOnly: true, donatedBy: user._id });
-
     try {
         const params = {
             Bucket: process.env.S3_BUCKET,
             Prefix: `${user._id}/`,
         };
-
         let objects = await s3.listObjectsV2(params).promise();
         objects.Contents.sort((a, b) => b.LastModified.getTime() - a.LastModified.getTime());
-
         const images = [];
         let storageUsed = 0;
-
         for (const object of objects.Contents) {
-            if (extname(object.Key) !== '.zip') {
-                storageUsed += object.Size;
-
-                images.push({
-                    link: `https://cdn.clippy.gg/${user._id}/${object.Key.split('/')[1]}`,
-                    dateUploaded: object.LastModified,
-                    filename: object.Key.split('/')[1],
-                    size: formatFilesize(object.Size),
-                });
-            }
+            storageUsed += object.Size;
+            images.push({
+                link: `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET}/${user._id}/${object.Key.split('/')[1]}`,
+                dateUploaded: object.LastModified,
+                filename: object.Key.split('/')[1],
+                size: formatFilesize(object.Size),
+            });
         }
-
-        if (domains.length !== 0) for (const domain of domains) {
-            if (domain.userOnly) {
-                params.Prefix = `${domain.name}/`;
-
-                objects = await s3.listObjectsV2(params).promise();
-                objects.Contents.sort((a, b) => b.LastModified.getTime() - a.LastModified.getTime());
-
-                for (const object of objects.Contents) {
-                    storageUsed += object.Size;
-
-                    images.push({
-                        link: `https://cdn.clippy.gg/${domain.name}/${object.Key.split('/')[1]}`,
-                        dateUploaded: object.LastModified,
-                        filename: object.Key.split('/')[1],
-                        size: formatFilesize(object.Size),
-                    });
-                }
-            }
-        }
-
         res.status(200).json({
             success: true,
             images,
