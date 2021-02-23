@@ -1,4 +1,4 @@
-import { S3 } from 'aws-sdk';
+import { S3, Endpoint } from 'aws-sdk';
 import DomainModel from '../models/DomainModel';
 import { User } from '../models/UserModel';
 import CounterModel from "../models/CounterModel";
@@ -7,8 +7,8 @@ import Axios, {Method} from "axios";
 /**
  * The aws-S3 session.
  */
-const spacesEndpoint = new AWS.Endpoint('nyc3.digitaloceanspaces.com');
-const s3 = new AWS.S3({
+const spacesEndpoint = new Endpoint('nyc3.digitaloceanspaces.com');
+const s3 = new S3({
     endpoint: spacesEndpoint,
     accessKeyId: process.env.S3_ACCESS_KEY_ID,
     secretAccessKey: process.env.S3_SECRET_KEY
