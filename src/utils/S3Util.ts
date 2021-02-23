@@ -105,6 +105,7 @@ async function wipeFiles(user: User, dir: string = `${user._id}/`) {
 export {
     s3,
     wipeFiles,
+    updateStorage,
     addPremium,
     request
 };
