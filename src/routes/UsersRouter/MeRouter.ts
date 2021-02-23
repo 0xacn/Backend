@@ -38,7 +38,7 @@ router.get('/images', async (req: Request, res: Response) => {
         for (const object of objects.Contents) {
             storageUsed += object.Size;
             images.push({
-                link: `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET}/${user._id}/${object.Key.split('/')[1]}`,
+                link: `${process.env.S3_ENDPOINT}/${user._id}/${object.Key.split('/')[1]}`,
                 dateUploaded: object.LastModified,
                 filename: object.Key.split('/')[1],
                 size: formatFilesize(object.Size),
