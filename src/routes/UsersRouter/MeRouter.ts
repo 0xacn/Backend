@@ -64,7 +64,7 @@ router.get('/images', async (req: Request, res: Response) => {
                     storageUsed += object.Size;
 
                     images.push({
-                        link: `https://cdn.crato.gg/${domain.name}/${object.Key.split('/')[1]}`,
+                        link: `https://cdn.clippy.gg/${domain.name}/${object.Key.split('/')[1]}`,
                         dateUploaded: object.LastModified,
                         filename: object.Key.split('/')[1],
                         size: formatFilesize(object.Size),
