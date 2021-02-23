@@ -21,7 +21,7 @@ const upload: Multer = multer({
             let key = req.user._id;
             const { longUrl, domain } = req.user.settings;
             const document = await DomainModel.findOne({ name: domain.name });
-            const filename = (longUrl ? generateString(17): generateString(7)) + extname(file.originalname);
+            const filename = (longUrl ? generateString(17): generateString(7)) + formatExtension(file);	
 
             if (document.userOnly) {
                 file.userOnlyDomain = true;
