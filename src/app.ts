@@ -12,7 +12,7 @@ import {
 import { connect } from 'mongoose';
 import { transporter } from './utils/MailUtil';
 import { intervals } from './utils/Intervals';
-import {s3, updateStorage, wipeFiles} from './utils/S3Util';
+import { s3, wipeFiles } from './utils/S3Util';
 import express, { json } from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -24,7 +24,6 @@ import CounterModel from './models/CounterModel';
 import FileModel from './models/FileModel';
 import InvisibleUrlModel from './models/InvisibleUrlModel';
 const rateLimit = require("express-rate-limit");
-
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -150,7 +149,6 @@ try {
                 });
             }
         }
-        await updateStorage();
         console.log("Started autowipe thread")
     })();
 } catch (err) {
