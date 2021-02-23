@@ -14,34 +14,7 @@ const s3 = new S3({
     },
     endpoint: process.env.S3_ENDPOINT,
 });
-// var s3  = new S3({
-//     accessKeyId: process.env.S3_ACCESS_KEY_ID ,
-//     secretAccessKey: process.env.S3_SECRET_KEY,
-//     endpoint: process.env.S3_ENDPOINT ,
-//     s3ForcePathStyle: true, // needed with minio?
-//     signatureVersion: 'v4'
-// });
 
-async function updateStorage() {
-    try {
-        const params = {
-            Bucket: process.env.S3_BUCKET,
-        };
-        let storageUsed = 0;
-        let objects = await s3.listObjectsV2(params).promise();
-        for (const object of objects.Contents) {
-            storageUsed += object.Size;
-        }
-        await CounterModel.findByIdAndUpdate('counter', {
-                storageUsed: storageUsed,
-        })
-        setTimeout(async () => {
-            await this.updateStorage();
-        }, 300000);
-    } catch (err) {
-        new Error(err)
-    }
-}
 async function request(endpoint: string, method: Method, body?: object | string, headers?: object){
     try {
         const baseUrl = 'https://discord.com/api/v8';
@@ -57,6 +30,7 @@ async function request(endpoint: string, method: Method, body?: object | string,
         throw "Couldn't link your discord. Please make sure you are not in the 100 server limit";
     }
 }
+
 async function addPremium(user: User) {
     await this.request(`/guilds/${process.env.DISCORD_SERVER_ID}/members/${user.discord.id}/roles/806106770212126730`, 'PUT',
         null, {
@@ -64,6 +38,7 @@ async function addPremium(user: User) {
         }
     );
 }
+
 /**
  * Wipe a user's files.
  * @param {user} user The user's files to wipe.
@@ -125,7 +100,6 @@ async function wipeFiles(user: User, dir: string = `${user._id}/`) {
 
         if (!objects.IsTruncated) return count;
     }
-
 }
 
 export {
