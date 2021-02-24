@@ -7,19 +7,19 @@ import Axios, {Method} from "axios";
 /**
  * The aws-S3 session.
  */
-// const spacesEndpoint = new Endpoint('nyc3.digitaloceanspaces.com');
-// const s3 = new S3({
-//     endpoint: spacesEndpoint,
-//     accessKeyId: process.env.S3_ACCESS_KEY_ID,
-//     secretAccessKey: process.env.S3_SECRET_KEY
-// });
+const spacesEndpoint = new Endpoint('nyc3.digitaloceanspaces.com');
 const s3 = new S3({
-    credentials: {
-        secretAccessKey: process.env.S3_SECRET_KEY,
-        accessKeyId: process.env.S3_ACCESS_KEY_ID,
-    },
-    endpoint: process.env.S3_ENDPOINT,
+    endpoint: spacesEndpoint,
+    accessKeyId: process.env.S3_ACCESS_KEY_ID,
+    secretAccessKey: process.env.S3_SECRET_KEY
 });
+// const s3 = new S3({
+//     credentials: {
+//         secretAccessKey: process.env.S3_SECRET_KEY,
+//         accessKeyId: process.env.S3_ACCESS_KEY_ID,
+//     },
+//     endpoint: process.env.S3_ENDPOINT,
+// });
 
 // the function below is terrible, disgusting, and long, I know, I couldn't really think of any either way to do it and I wanted to release quickly, sorry!
 async function updateStorage() {
