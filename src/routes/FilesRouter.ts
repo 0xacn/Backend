@@ -64,7 +64,7 @@ router.post('/',fileLimiter, UploadMiddleware, upload.single('file'), async (req
 
     if (!allowedFileTypes.some((fileType: string) => file.filename.toLowerCase().endsWith(`.${fileType}`))) return res.sendStatus(403).json({
         success: false,
-        error: `The allowed file types are ${allowedFileTypes.map((fileType: string) => `.${fileType}`).join(', ').replace(/,\s([^,]+)$/, ' or $1')}`
+        error: `The allowed file types are ${allowedFileTypes.map((fileType: string) => `.${fileType}`).join(', ').replace(/\s([^,]+)$/, ' or $1')}`
     });
 
 
