@@ -67,13 +67,14 @@ router.post('/',fileLimiter, UploadMiddleware, upload.single('file'), async (req
         '.gif' ||
         '.tiff' ||
         '.raw' ||
-        '.mp3'
+        '.mp3' ||
+        '.mp4'
     )) return res.sendStatus(403).json({
         success: false,
-        error: 'The allowed file types are .png, .jpg, .jpeg, and .gif, .tiff, .raw, or .mp3.'
+        error: 'The allowed file types are .png, .jpg, .jpeg, and .gif, .tiff, .raw, .mp3, or .mp4'
     });
 
-    if (!user.premium && file.size > 15728640 || file.size > 104857600) return res.sendStatus(413).json({
+    if ((file.size > 15728640 && !user.premium) || file.size > 104857600) return res.sendStatus(413).json({
         success: false,
         error: `your file is too large, your upload limit is: ${user.premium ? '100' : '15'} MB`
     });
