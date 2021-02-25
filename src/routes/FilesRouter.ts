@@ -59,11 +59,23 @@ router.post('/',fileLimiter, UploadMiddleware, upload.single('file'), async (req
         success: false,
         error: 'provide a file',
     });
-    if ((file.size > 20971520 && !user.premium) || file.size > 104857600) return res.status(413).json({
+
+    if (!file.filename.toLowerCase().endsWith(
+        '.png' ||
+        '.jpg' ||
+        '.jpeg' ||
+        '.gif' ||
+        '.tiff' ||
+        '.raw' ||
+        '.mp3'
+    )) return res.sendStatus(403).json({
         success: false,
-        error: `your file is too large, your upload limit is: ${
-            user.premium ? '100' : '20'
-        } MB`,
+        error: 'The allowed file types are .png, .jpg, .jpeg, and .gif, .tiff, .raw, or .mp3.'
+    });
+
+    if (!user.premium && file.size > 15728640 || file.size > 104857600) return res.sendStatus(413).json({
+        success: false,
+        error: `your file is too large, your upload limit is: ${user.premium ? '100' : '15'} MB`
     });
 
     const { domain, randomDomain, embed, showLink, invisibleUrl, fakeUrl } = user.settings;
