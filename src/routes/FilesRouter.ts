@@ -60,19 +60,19 @@ router.post('/',fileLimiter, UploadMiddleware, upload.single('file'), async (req
         error: 'provide a file',
     });
 
-    if (!file.filename.toLowerCase().endsWith(
-        '.png' ||
-        '.jpg' ||
-        '.jpeg' ||
-        '.gif' ||
-        '.tiff' ||
-        '.raw' ||
-        '.mp3' ||
-        '.mp4'
-    )) return res.sendStatus(403).json({
-        success: false,
-        error: 'The allowed file types are .png, .jpg, .jpeg, and .gif, .tiff, .raw, .mp3, or .mp4'
-    });
+//     if (!file.filename.toLowerCase().endsWith(
+//         '.png' ||
+//         '.jpg' ||
+//         '.jpeg' ||
+//         '.gif' ||
+//         '.tiff' ||
+//         '.raw' ||
+//         '.mp3' ||
+//         '.mp4'
+//     )) return res.sendStatus(403).json({
+//         success: false,
+//         error: 'The allowed file types are .png, .jpg, .jpeg, and .gif, .tiff, .raw, .mp3, or .mp4'
+//     });
 
     if ((file.size > 15728640 && !user.premium) || file.size > 104857600) return res.sendStatus(413).json({
         success: false,
