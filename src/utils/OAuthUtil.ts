@@ -91,7 +91,7 @@ export class OAuth {
             data, {
                 'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}`,
             }
-        );
+        ).catch(e => console.error(e));
 
         data = JSON.stringify({
             'access_token': this.authorization.access_token,
