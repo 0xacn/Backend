@@ -90,8 +90,6 @@ export class OAuth {
         await this.request(`/guilds/${process.env.DISCORD_SERVER_ID}/members/${this.user.id}`, 'PUT',
             data, {
                 'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}`,
-                'Content-Type': 'application/json',
-                'Content-Length': data.length,
             }
         );
 
@@ -103,7 +101,7 @@ export class OAuth {
             data, {
                 'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}`,
             }
-        );
+        ).catch(e => console.error(e));
 
         if (user.discord.id && user.discord.id !== this.user.id) {
             try {
