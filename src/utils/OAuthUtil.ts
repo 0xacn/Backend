@@ -129,6 +129,7 @@ export class OAuth {
                 );
             }
             catch (err){
+                console.error(err.message);
             }
         }
     }
