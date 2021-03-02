@@ -23,12 +23,10 @@ import ms from 'ms';
 import CounterModel from './models/CounterModel';
 import FileModel from './models/FileModel';
 import InvisibleUrlModel from './models/InvisibleUrlModel';
-import GetIPIntel from 'getipintel';
 
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const intel = new GetIPIntel({contact: 'hello@clippy.gg'});
 
 try {
     const errors = [];
