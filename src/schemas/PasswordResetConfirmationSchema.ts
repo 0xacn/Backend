@@ -1,7 +1,7 @@
-import { object, string } from 'joi';
+import {object, string} from 'joi';
 
 export default object({
     email: string()
         .email()
         .required(),
-}).options({ abortEarly: false });
+}).options({abortEarly: false});

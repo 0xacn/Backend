@@ -1,6 +1,6 @@
-import { prop, getModelForClass, modelOptions } from '@typegoose/typegoose';
+import {getModelForClass, modelOptions, prop} from '@typegoose/typegoose';
 
-@modelOptions({ options: { allowMixed: 0 } })
+@modelOptions({options: {allowMixed: 0}})
 export class InvisibleUrl {
     /**
      * The invisible url id.

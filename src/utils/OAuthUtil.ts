@@ -1,8 +1,8 @@
-import Axios, { Method } from 'axios';
-import { AuthorizationInterface } from './interfaces/AuthorizationInterface';
-import { DiscordUserInterface } from './interfaces/DiscordUserInterface';
-import { stringify } from 'querystring';
-import { User } from '../models/UserModel';
+import Axios, {Method} from 'axios';
+import {AuthorizationInterface} from './interfaces/AuthorizationInterface';
+import {DiscordUserInterface} from './interfaces/DiscordUserInterface';
+import {stringify} from 'querystring';
+import {User} from '../models/UserModel';
 
 export class OAuth {
     /**
@@ -34,10 +34,10 @@ export class OAuth {
     request = async (endpoint: string, method: Method, body?: object | string, headers?: object): Promise<any> => {
         try {
             const baseUrl = 'https://discord.com/api';
-            const { data } = await Axios({
+            const {data} = await Axios({
                 url: `${baseUrl}${endpoint}`,
                 method,
-                headers: headers ? headers: null,
+                headers: headers ? headers : null,
                 data: body ? body : null,
             });
 
@@ -127,8 +127,7 @@ export class OAuth {
                         'Content-Type': 'application/json',
                     }
                 );
-            }
-            catch (err){
+            } catch (err) {
                 console.error(err);
             }
         }

@@ -1,4 +1,4 @@
-import { boolean, object } from 'joi';
+import {boolean, object} from 'joi';
 
 export default object({
     longUrl: boolean()
@@ -21,4 +21,4 @@ export default object({
 
     fakeUrl: boolean()
         .optional(),
-}).options({ abortEarly: false });
+}).options({abortEarly: false});

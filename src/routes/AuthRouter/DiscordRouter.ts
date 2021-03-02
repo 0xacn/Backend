@@ -1,9 +1,10 @@
-import { Request, Response, Router } from 'express';
-import { sign, verify } from 'jsonwebtoken';
+import {Request, Response, Router} from 'express';
+import {sign, verify} from 'jsonwebtoken';
 import OAuthMiddleware from '../../middlewares/OAuthMiddleware';
 import PasswordResetModel from '../../models/PasswordResetModel';
 import RefreshTokenModel from '../../models/RefreshTokenModel';
 import UserModel from '../../models/UserModel';
+
 const router = Router();
 
 router.get('/login', (req: Request, res: Response) => {
@@ -15,21 +16,21 @@ router.get('/login', (req: Request, res: Response) => {
 });
 
 router.get('/login/callback', OAuthMiddleware(), async (req: Request, res: Response) => {
-    const { id, avatar, discriminator } = req.discord.user;
+    const {id, avatar, discriminator} = req.discord.user;
 
     try {
-        const user = await UserModel.findOne({ 'discord.id': id });
+        const user = await UserModel.findOne({'discord.id': id});
 
-        if (!user || !user.emailVerified || user.blacklisted.status)
+        if (!user || user.blacklisted.status || !user.emailVerified ) {
             return res.status(401).redirect(process.env.FRONTEND_URL);
-
-        const passwordReset = await PasswordResetModel.findOne({ user: user._id });
+        }
+        const passwordReset = await PasswordResetModel.findOne({user: user._id});
         if (passwordReset) await passwordReset.remove();
         let avatarurl
-        if(avatar && avatar.startsWith("a_")){
+        if (avatar && avatar.startsWith("a_")) {
             avatarurl = `https://cdn.discordapp.com/${avatar ? `avatars/${id}/${avatar}` : `embed/avatars/${discriminator % 5}`}.gif`
-        } else{
-            avatarurl =  `https://cdn.discordapp.com/${avatar ? `avatars/${id}/${avatar}` : `embed/avatars/${discriminator % 5}`}.png`
+        } else {
+            avatarurl = `https://cdn.discordapp.com/${avatar ? `avatars/${id}/${avatar}` : `embed/avatars/${discriminator % 5}`}.png`
         }
         const update = {
             'lastLogin': new Date(),
@@ -37,7 +38,7 @@ router.get('/login/callback', OAuthMiddleware(), async (req: Request, res: Respo
         };
 
         await UserModel.findByIdAndUpdate(user._id, update);
-        const refreshToken = sign({ _id: user._id }, process.env.REFRESH_TOKEN_SECRET);
+        const refreshToken = sign({_id: user._id}, process.env.REFRESH_TOKEN_SECRET);
 
         await RefreshTokenModel.create({
             token: refreshToken,
@@ -45,7 +46,7 @@ router.get('/login/callback', OAuthMiddleware(), async (req: Request, res: Respo
             expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
         });
 
-        res.cookie('x-refresh-token', refreshToken, { httpOnly: true, secure: false });
+        res.cookie('x-refresh-token', refreshToken, {httpOnly: true, secure: false});
         res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
     } catch (err) {
         res.status(500).json({
@@ -75,7 +76,7 @@ router.get('/link/callback', OAuthMiddleware('link'), async (req: Request, res: 
     });
 
     try {
-        const refreshToken = await RefreshTokenModel.findOne({ token: cookie });
+        const refreshToken = await RefreshTokenModel.findOne({token: cookie});
 
         if (!refreshToken || Date.now() >= new Date(refreshToken.expires).getTime()) {
             if (refreshToken) await refreshToken.remove();
@@ -90,7 +91,7 @@ router.get('/link/callback', OAuthMiddleware('link'), async (req: Request, res: 
 
         const token: any = verify(refreshToken.token, process.env.REFRESH_TOKEN_SECRET);
 
-        const user = await UserModel.findOne({ _id: token._id })
+        const user = await UserModel.findOne({_id: token._id})
             .select('-__v -password');
 
         if (!user) return res.status(401).json({
@@ -103,14 +104,14 @@ router.get('/link/callback', OAuthMiddleware('link'), async (req: Request, res: 
             error: 'your email is not verified',
         });
 
-        const { id, avatar, discriminator } = req.discord.user;
+        const {id, avatar, discriminator} = req.discord.user;
 
         await req.discord.addGuildMember(user);
         let avatarurl
-        if(avatar && avatar.startsWith("a_")){
+        if (avatar && avatar.startsWith("a_")) {
             avatarurl = `https://cdn.discordapp.com/${avatar ? `avatars/${id}/${avatar}` : `embed/avatars/${discriminator % 5}`}.gif`
-        } else{
-            avatarurl =  `https://cdn.discordapp.com/${avatar ? `avatars/${id}/${avatar}` : `embed/avatars/${discriminator % 5}`}.png`
+        } else {
+            avatarurl = `https://cdn.discordapp.com/${avatar ? `avatars/${id}/${avatar}` : `embed/avatars/${discriminator % 5}`}.png`
         }
         await UserModel.findByIdAndUpdate(user._id, {
             discord: {

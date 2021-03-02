@@ -1,31 +1,30 @@
-import { Request, Response, Router } from 'express';
-import { s3 } from '../../utils/S3Util';
+import {Request, Response, Router} from 'express';
+import {s3} from '../../utils/S3Util';
 import AuthMiddleware from '../../middlewares/AuthMiddleware';
 import ValidationMiddleware from '../../middlewares/ValidationMiddleware';
 import UserModel from '../../models/UserModel';
 import SettingsRouter from './SettingsRouter';
-import { formatFilesize } from '../../utils/FormatUtil';
-import { generateString } from '../../utils/GenerateUtil';
+import {formatFilesize} from '../../utils/FormatUtil';
+import {generateString} from '../../utils/GenerateUtil';
 import InviteModel from '../../models/InviteModel';
-import DomainModel from '../../models/DomainModel';
 import RefreshTokenModel from '../../models/RefreshTokenModel';
 import ChangeUsernameSchema from '../../schemas/ChangeUsernameSchema';
-import { hash, verify } from 'argon2';
+import {hash, verify} from 'argon2';
 import ChangePasswordSchema from '../../schemas/ChangePasswordSchema';
-import { extname } from 'path';
+
 const router = Router();
 
 router.use(AuthMiddleware);
 router.use('/settings', SettingsRouter);
 
 router.get('/', async (req: Request, res: Response) => {
-    const { user } = req;
+    const {user} = req;
 
     res.status(200).json(user);
 });
 
 router.get('/images', async (req: Request, res: Response) => {
-    const { user } = req;
+    const {user} = req;
     try {
         const params = {
             Bucket: process.env.S3_BUCKET,
@@ -58,7 +57,7 @@ router.get('/images', async (req: Request, res: Response) => {
 });
 
 router.post('/disable', async (req: Request, res: Response) => {
-    const { user } = req;
+    const {user} = req;
 
     try {
         await UserModel.findByIdAndUpdate(user._id, {
@@ -68,7 +67,7 @@ router.post('/disable', async (req: Request, res: Response) => {
             },
         });
 
-        await RefreshTokenModel.deleteMany({ user: user._id });
+        await RefreshTokenModel.deleteMany({user: user._id});
 
         res.clearCookie('x-refresh-token');
 
@@ -85,7 +84,7 @@ router.post('/disable', async (req: Request, res: Response) => {
 });
 
 router.post('/regen_key', async (req: Request, res: Response) => {
-    const { user } = req;
+    const {user} = req;
 
     try {
         const now = Date.now();
@@ -126,11 +125,11 @@ router.post('/regen_key', async (req: Request, res: Response) => {
 });
 
 router.get('/created_invites', async (req: Request, res: Response) => {
-    const { user } = req;
+    const {user} = req;
 
     try {
         // eslint-disable-next-line quote-props
-        const invites = await InviteModel.find({ 'createdBy.uuid': user._id, useable: true })
+        const invites = await InviteModel.find({'createdBy.uuid': user._id, useable: true})
             .select('-__v -createdBy');
 
         res.status(200).json({
@@ -146,8 +145,8 @@ router.get('/created_invites', async (req: Request, res: Response) => {
 });
 
 router.put('/change_username', ValidationMiddleware(ChangeUsernameSchema), async (req: Request, res: Response) => {
-    let { user } = req;
-    const { username, password } = req.body;
+    let {user} = req;
+    const {username, password} = req.body;
 
     try {
         user = await UserModel.findById(user._id);
@@ -181,7 +180,7 @@ router.put('/change_username', ValidationMiddleware(ChangeUsernameSchema), async
             error: 'provide a new username',
         });
 
-        const usernameTaken = await UserModel.findOne({ username: { $regex: new RegExp(username, 'i') } });
+        const usernameTaken = await UserModel.findOne({username: {$regex: new RegExp(username, 'i')}});
 
         if (usernameTaken) return res.status(400).json({
             success: false,
@@ -206,8 +205,8 @@ router.put('/change_username', ValidationMiddleware(ChangeUsernameSchema), async
 });
 
 router.put('/change_password', ValidationMiddleware(ChangePasswordSchema), async (req: Request, res: Response) => {
-    let { user } = req;
-    const { newPassword, password } = req.body;
+    let {user} = req;
+    const {newPassword, password} = req.body;
 
     try {
         user = await UserModel.findById(user._id);
@@ -229,7 +228,7 @@ router.put('/change_password', ValidationMiddleware(ChangePasswordSchema), async
             password: hashed,
         });
 
-        await RefreshTokenModel.deleteMany({ user: user._id });
+        await RefreshTokenModel.deleteMany({user: user._id});
 
         res.status(200).json({
             success: true,

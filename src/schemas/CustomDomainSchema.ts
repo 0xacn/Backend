@@ -1,4 +1,4 @@
-import { boolean, object, string } from 'joi';
+import {boolean, object, string} from 'joi';
 
 export default object({
     name: string()
@@ -9,4 +9,4 @@ export default object({
 
     userOnly: boolean()
         .required(),
-}).options({ abortEarly: false });
+}).options({abortEarly: false});

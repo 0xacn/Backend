@@ -1,7 +1,6 @@
 import Mail from 'nodemailer/lib/mailer';
 import nodemailer from 'nodemailer';
-import smtpTransport from 'nodemailer-smtp-transport';
-import { User } from '../models/UserModel';
+import {User} from '../models/UserModel';
 
 const emailAddress = 'dnywtf@gmail.com';
 

@@ -1,19 +1,19 @@
 import 'dotenv/config';
 import {
-    FilesRouter,
-    InvitesRouter,
-    DomainsRouter,
+    AdminRouter,
     AuthRouter,
     BaseRouter,
-    UsersRouter,
+    DomainsRouter,
+    FilesRouter,
+    InvitesRouter,
     ShortenerRouter,
-    AdminRouter
+    UsersRouter
 } from './routes';
-import { connect } from 'mongoose';
-import { transporter } from './utils/MailUtil';
-import { intervals } from './utils/Intervals';
-import {s3, updateStorage, wipeFiles} from './utils/S3Util';
-import express, { json } from 'express';
+import {connect} from 'mongoose';
+import {transporter} from './utils/MailUtil';
+import {intervals} from './utils/Intervals';
+import {updateStorage, wipeFiles} from './utils/S3Util';
+import express, {json} from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import helmet from "helmet";
@@ -23,11 +23,12 @@ import ms from 'ms';
 import CounterModel from './models/CounterModel';
 import FileModel from './models/FileModel';
 import InvisibleUrlModel from './models/InvisibleUrlModel';
-const rateLimit = require("express-rate-limit");
+import GetIPIntel from 'getipintel';
 
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const intel = new GetIPIntel({contact: 'hello@clippy.gg'});
 
 try {
     const errors = [];
@@ -88,7 +89,6 @@ try {
     app.use(json());
     app.use(cookieParser());
     app.use(SessionMiddleware);
-
     app.use('/', BaseRouter);
     app.use('/files', FilesRouter);
     app.use('/invites', InvitesRouter);
@@ -100,7 +100,6 @@ try {
     app.use((_req, res) => {
         res.redirect(process.env.FRONTEND_URL)
     });
-
     app.listen(PORT, () => {
         console.log(`Listening to port ${PORT}`);
     });
@@ -118,8 +117,8 @@ try {
         console.log("Mail verified")
         const findCounter = await CounterModel.findById('counter');
         if (!findCounter) throw new Error('Create a counter document with the value 1 as the count');
-        for (const user of await UserModel.find({ 'settings.autoWipe.enabled': true })) {
-            const { interval } = user.settings.autoWipe;
+        for (const user of await UserModel.find({'settings.autoWipe.enabled': true})) {
+            const {interval} = user.settings.autoWipe;
             const validIntervals = [ms('1h'), ms('2h'), ms('12h'), ms('24h'), ms('1w'), ms('2w'), 2147483647];
 
             if (validIntervals.includes(interval)) {
@@ -141,7 +140,8 @@ try {
                         await UserModel.findByIdAndUpdate(user._id, {
                             uploads: 0,
                         });
-                    } catch (err) {}
+                    } catch (err) {
+                    }
                 }, interval);
 
                 intervals.push({

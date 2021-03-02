@@ -1,24 +1,25 @@
 import Axios from 'axios';
-import { Domain } from '../models/DomainModel';
-import UserModel, {User} from "../models/UserModel";
+import {Domain} from '../models/DomainModel';
+import {User} from "../models/UserModel";
 
 /**
  * Log a list of new domains to the domain notifications channel.
  * @param {Domain[]} domains The domain that was created.
+ * @param {string} donatedby The name of donator
  */
-async function logDomains(domains: Domain[]) {
+async function logDomains(domains: Domain[], donatedby :string) {
     const grammar = domains.length > 1 ? `**${domains.length}** new domains have` : 'A new domain has';
-    const domainList = domains.map((d) => (d.wildcard ? '*.' : '') + d.name ).join(',\n');
+    const domainList = domains.map((d) => (d.wildcard ? '*.' : '') + d.name).join(',\n');
 
     await Axios.post(process.env.WEBHOOK_URL, {
         embeds: [
             {
-                title: `${grammar} been added, DNS records have automatically been updated.`,
+                title: `${grammar} been ${donatedby ? "added" : ("donated by: " + donatedby)}, DNS records have automatically been updated.`,
                 description: `\`\`\`${domainList}\`\`\``
             },
         ],
     });
-};
+}
 
 /**
  * Log a single custom domain to the webhook in the server.
@@ -43,7 +44,7 @@ async function logCustomDomain(domain: Domain) {
                         value: domain.donatedBy,
                     },
                     {
-                        name: 'User Only',
+                        name: 'Private',
                         value: domain.userOnly ? 'Yes' : 'No',
                     },
                 ],
@@ -51,17 +52,19 @@ async function logCustomDomain(domain: Domain) {
         ],
     });
 }
+
 /**
  * Log a possible alt to the discord.
- * @param {User[]} users The users.
+ * @param {User[]} relatedAlts The users.
  * @param alt
+ * @param register
  */
-async function logPossibleAlts(users: User[], alt: User) {
-    const altsList = users.map((d) =>  d.username + (d.blacklisted.status ? ' (Blacklisted)' : '')).join(', ');
+async function logPossibleAlts(relatedAlts: User[], alt: User, register: boolean) {
+    const altsList = relatedAlts.map((d) => d.username + (d.blacklisted.status ? ' (Blacklisted)' : '')).join(', ');
     await Axios.post(process.env.CUSTOM_DOMAIN_WEBHOOK, {
         embeds: [
             {
-                title: 'New possible alt detected:',
+                title: `A new possible account has ${register ? "registered" : "logged in"}`,
                 fields: [
                     {
                         name: 'Username:',
@@ -92,7 +95,7 @@ async function logPossibleAlts(users: User[], alt: User) {
                         value: `\`\`\`${alt._id}\`\`\``
                     },
                 ],
-                thumbnail:{
+                thumbnail: {
                     url: alt.discord.avatar
                 }
             },

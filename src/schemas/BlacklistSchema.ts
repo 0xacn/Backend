@@ -1,4 +1,4 @@
-import { object, string } from 'joi';
+import {object, string} from 'joi';
 
 export default object({
     id: string()
@@ -9,4 +9,4 @@ export default object({
 
     executerId: string()
         .required(),
-}).options({ abortEarly: false });
+}).options({abortEarly: false});

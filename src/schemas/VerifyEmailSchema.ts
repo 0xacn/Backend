@@ -1,6 +1,6 @@
-import { object, string } from 'joi';
+import {object, string} from 'joi';
 
 export default object({
     key: string()
         .required(),
-}).options({ abortEarly: false });
+}).options({abortEarly: false});

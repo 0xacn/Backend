@@ -1,20 +1,7 @@
-import { prop, getModelForClass, modelOptions } from '@typegoose/typegoose';
+import {getModelForClass, modelOptions, prop} from '@typegoose/typegoose';
 
-class Notification {
-    /**
-     * The notification id.
-     */
-    @prop()
-    id: string;
 
-    /**
-     * The notification message.
-     */
-    @prop()
-    message: string;
-}
-
-@modelOptions({ options: { allowMixed: 0 } })
+@modelOptions({options: {allowMixed: 0}})
 export class User {
     /**
      * The user's uuid.
@@ -145,13 +132,13 @@ export class User {
     /**
      * The users that the user invited.
      */
-    @prop({ type: () => [String] })
+    @prop({type: () => [String]})
     invitedUsers: string[];
 
     /**
      * The users that the user invited.
      */
-    @prop({ type: () => [String] })
+    @prop({type: () => [String]})
     ips: string[];
 
     /**
@@ -171,9 +158,12 @@ export class User {
      */
     @prop()
     admin: boolean;
+    /**
+     * Whether or not the user bypasses the alt checks.
+     */
+    @prop()
+    bypassAltCheck: boolean;
 
-    @prop({ type: () => [Notification] })
-    notifications: Array<Notification>;
 
     /**
      * The user's settings, their preferences, their domain, etc.

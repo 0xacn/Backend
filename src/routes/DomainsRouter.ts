@@ -1,4 +1,4 @@
-import { Request, Response, Router } from 'express';
+import {Request, Response, Router} from 'express';
 import AdminMiddleware from '../middlewares/AdminMiddleware';
 import AuthMiddleware from '../middlewares/AuthMiddleware';
 import ValidationMiddleware from '../middlewares/ValidationMiddleware';
@@ -7,22 +7,26 @@ import UserModel from '../models/UserModel';
 import CustomDomainSchema from '../schemas/CustomDomainSchema';
 import DomainSchema from '../schemas/DomainSchema';
 import CloudflareUtil from '../utils/CloudflareUtil';
-import { logCustomDomain, logDomains } from '../utils/LoggingUtil';
+import {logCustomDomain, logDomains} from '../utils/LoggingUtil';
 import AdminAuthMiddleware from "../middlewares/AdminAuthMiddleware";
 import isValidDomain from 'is-valid-domain';
+
 const router = Router();
 
 router.get('/', AdminAuthMiddleware, async (req: Request, res: Response) => {
-    const { user } = req;
+    const {user} = req;
     try {
         const count = await DomainModel.countDocuments();
-        let domains: any = await DomainModel.find({ userOnly: false })
-            .select('-__v -_id -donatedBy').sort({name:1}).lean();
+        let domains: any = await DomainModel.find({userOnly: false})
+            .select('-__v -_id -donatedBy').sort({name: 1}).lean();
 
-        if (user) domains = (await DomainModel.find({ userOnly: true, donatedBy: user._id }).select('-__v -_id -donatedBy').lean()).concat(domains);
+        if (user) domains = (await DomainModel.find({
+            userOnly: true,
+            donatedBy: user._id
+        }).select('-__v -_id -donatedBy').lean()).concat(domains);
 
         for (let i = 0; i < domains.length; i++) {
-            const users = await UserModel.countDocuments({ 'settings.domain.name': domains[i].name });
+            const users = await UserModel.countDocuments({'settings.domain.name': domains[i].name});
 
             domains[i].users = users;
         }
@@ -41,7 +45,7 @@ router.get('/', AdminAuthMiddleware, async (req: Request, res: Response) => {
 });
 
 router.post('/', AdminMiddleware, ValidationMiddleware(DomainSchema), async (req: Request, res: Response) => {
-    const { user, body } = req;
+    const {user, body} = req;
 
     if (body.length <= 0) return res.status(400).json({
         success: false,
@@ -50,8 +54,8 @@ router.post('/', AdminMiddleware, ValidationMiddleware(DomainSchema), async (req
 
     try {
         for (const field of body) {
-            let { name, wildcard, donated, donatedBy, userOnly } = field;
-            const domain = await DomainModel.findOne({ name });
+            let {name, wildcard, donated, donatedBy, userOnly} = field;
+            const domain = await DomainModel.findOne({name});
 
             if (domain) return res.status(400).json({
                 success: false,
@@ -86,7 +90,7 @@ router.post('/', AdminMiddleware, ValidationMiddleware(DomainSchema), async (req
                 dateAdded: new Date(),
             });
         }
-        if(!req.body[0].userOnly) {
+        if (!req.body[0].userOnly) {
             await logDomains(req.body);
         }
 
@@ -103,24 +107,24 @@ router.post('/', AdminMiddleware, ValidationMiddleware(DomainSchema), async (req
 });
 
 router.post('/custom', AuthMiddleware, ValidationMiddleware(CustomDomainSchema), async (req: Request, res: Response) => {
-    const { user } = req;
-    const { name, wildcard, userOnly } = req.body;
+    const {user} = req;
+    const {name, wildcard, userOnly} = req.body;
 
     if (!user.premium && !user.admin) return res.status(401).json({
         success: false,
         error: 'you do not have permission to add custom domains',
     });
-    
-    if (name.endsWith(".tk") || name.endsWith(".ml") || name.endsWith(".ga") || name.endsWith(".cf") || name.endsWith(".gq"))return res.status(401).json({
+
+    if (name.endsWith(".tk") || name.endsWith(".ml") || name.endsWith(".ga") || name.endsWith(".cf") || name.endsWith(".gq")) return res.status(401).json({
         success: false,
         error: 'clippy is currently not accepting free domains',
     });
-    
+
     if (name.startsWith("http")) return res.status(401).json({
         success: false,
         error: 'please enter domains in the right format',
     });
-    
+
     if (!isValidDomain(name)) return res.status(401).json({
         success: false,
         error: 'domain isn\'t formatted correctly'
@@ -143,7 +147,7 @@ router.post('/custom', AuthMiddleware, ValidationMiddleware(CustomDomainSchema),
 
             return;
         }
-        let domain: any = await DomainModel.findOne({ name: { $regex: new RegExp(name, 'i') } });
+        let domain: any = await DomainModel.findOne({name: {$regex: new RegExp(name, 'i')}});
 
         if (domain) return res.status(400).json({
             success: false,
@@ -182,8 +186,8 @@ router.post('/custom', AuthMiddleware, ValidationMiddleware(CustomDomainSchema),
 });
 
 router.delete('/:name', AdminMiddleware, async (req: Request, res: Response) => {
-    const { name } = req.params;
-    const domain = await DomainModel.findOne({ name });
+    const {name} = req.params;
+    const domain = await DomainModel.findOne({name});
 
     if (!domain) return res.status(404).json({
         success: false,
@@ -194,7 +198,7 @@ router.delete('/:name', AdminMiddleware, async (req: Request, res: Response) => 
         await CloudflareUtil.deleteZone(domain.name).catch((e) => console.log(e));
         await domain.remove();
 
-        await UserModel.updateMany({ 'settings.domain.name': domain.name }, {
+        await UserModel.updateMany({'settings.domain.name': domain.name}, {
             'settings.domain.name': 'i.clippy.gg',
             'settings.domain.subdomain': null,
         });
@@ -211,7 +215,7 @@ router.delete('/:name', AdminMiddleware, async (req: Request, res: Response) => 
     }
 });
 
-router.get('/list', AdminAuthMiddleware,async (_req: Request, res: Response) => {
+router.get('/list', AdminAuthMiddleware, async (_req: Request, res: Response) => {
     try {
         const domains = await DomainModel.find({})
             .select('-__v -_id -wildcard -donated -donatedBy -dateAdded');
@@ -225,13 +229,13 @@ router.get('/list', AdminAuthMiddleware,async (_req: Request, res: Response) => 
     }
 });
 
-router.get('/rank', AdminAuthMiddleware,async (_req: Request, res: Response) => {
+router.get('/rank', AdminAuthMiddleware, async (_req: Request, res: Response) => {
     try {
         const domains = await DomainModel.find({});
         const ranks = [];
 
         for (const domain of domains) {
-            const users = await UserModel.countDocuments({ 'settings.domain.name': domain.name });
+            const users = await UserModel.countDocuments({'settings.domain.name': domain.name});
             ranks.push({
                 domain: domain.name,
                 users,

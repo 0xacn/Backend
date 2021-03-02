@@ -1,4 +1,4 @@
-import { boolean, object, string } from 'joi';
+import {object, string} from 'joi';
 
 export default object({
     url: string()
@@ -6,4 +6,4 @@ export default object({
         .allow('')
         .max(100),
 
-}).options({ abortEarly: false });
+}).options({abortEarly: false});

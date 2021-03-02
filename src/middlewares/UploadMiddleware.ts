@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import {NextFunction, Request, Response} from 'express';
 import DomainModel from '../models/DomainModel';
 import UserModel from '../models/UserModel';
 
@@ -10,7 +10,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
         error: 'provide a key',
     });
 
-    const user = await UserModel.findOne({ key });
+    const user = await UserModel.findOne({key});
 
     if (!user) return res.status(401).json({
         success: false,
@@ -27,7 +27,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
             'blacklisted.status': true,
         });
 
-    if(ipuser){
+    if (ipuser) {
         return res.status(401).json({
             success: false,
             error: `you are blacklisted for a punishment related to ${ipuser.username} for: ${ipuser.blacklisted.reason}`,
@@ -44,7 +44,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
         error: 'please link your discord',
     });
 
-    const domain = await DomainModel.findOne({ name: user.settings.domain.name });
+    const domain = await DomainModel.findOne({name: user.settings.domain.name});
 
     if (!domain) return res.status(400).json({
         success: false,

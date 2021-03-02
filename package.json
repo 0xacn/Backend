@@ -1,14 +1,14 @@
 {
-  "name": "dny-server",
-  "version": "2.0.0",
-  "description": "Rewritten server for dny.wtf",
+  "name": "clippy-server",
+  "version": "1.0.0",
+  "description": "First version of clippys backend",
   "main": "src/app.ts",
   "scripts": {
     "build": "tsc --build",
     "start": "node build/app",
     "dev": "nodemon --exec ts-node --files src/app.ts"
   },
-  "author": "shrunkie#0001",
+  "author": "clippy",
   "devDependencies": {
     "@types/uuid": "^8.3.0",
     "@typescript-eslint/eslint-plugin": "^4.8.2",
@@ -33,7 +33,7 @@
     "@types/multer-s3": "^2.7.8",
     "@types/nodemailer": "^6.4.0",
     "archiver": "^5.1.0",
-    "argon2": "^0.27.0",
+    "argon2": "^0.27.1",
     "aws-sdk": "^2.799.0",
     "axios": "^0.21.1",
     "cookie-parser": "^1.4.5",
@@ -41,6 +41,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-rate-limit": "^5.2.3",
+    "getipintel": "^1.0.4",
     "helmet": "^4.4.1",
     "is-valid-domain": "0.0.17",
     "joi": "^17.3.0",
@@ -52,7 +53,9 @@
     "nodemailer": "^6.4.16",
     "nodemailer-smtp-transport": "^2.7.4",
     "path": "^0.12.7",
+    "proxycheck-node.js": "^2.0.0-a",
     "querystring": "^0.2.0",
+    "safe-browse-url-lookup": "^0.1.1",
     "stream": "0.0.2",
     "uuid": "^8.3.1"
   }

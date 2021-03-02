@@ -1,4 +1,4 @@
-import { object, string } from 'joi';
+import {object, string} from 'joi';
 
 export default object({
     key: string()
@@ -13,4 +13,4 @@ export default object({
         .min(5)
         .max(60)
         .required(),
-}).options({ abortEarly: false });
+}).options({abortEarly: false});

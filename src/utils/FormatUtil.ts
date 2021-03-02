@@ -1,7 +1,7 @@
-import { File } from '../models/FileModel';
-import { User } from '../models/UserModel';
-import { EmbedInterface } from './interfaces/EmbedInterface';
-import { extname } from 'path';
+import {File} from '../models/FileModel';
+import {User} from '../models/UserModel';
+import {EmbedInterface} from './interfaces/EmbedInterface';
+import {extname} from 'path';
 
 /**
  * Format a file size to a human readable format.
@@ -25,7 +25,7 @@ function formatFilesize(size: number): string {
  */
 function formatExtension(file: Express.Multer.File): string {
     let extension = extname(file.originalname);
-    if(extension === ""){
+    if (extension === "") {
         extension = ".png"
         file.mimetype = "image/png"
     }
@@ -94,15 +94,16 @@ function formatEmbed(embed: EmbedInterface, user: User, file: File): EmbedInterf
 
 function formatFakeUrl(url: string, user: User, file: File) {
     return url
-                    .replace('{size}', file.size)
-                    .replace('{username}', user.username)
-                    .replace('{filename}', file.filename)
-                    .replace('{uploads}', user.uploads.toString())
-                    .replace('{date}', file.timestamp.toLocaleDateString())
-                    .replace('{time}', file.timestamp.toLocaleTimeString())
-                    .replace('{timestamp}', file.timestamp.toLocaleString())
-                    .replace('{fakeurl}', user.settings.fakeUrl.url);
+        .replace('{size}', file.size)
+        .replace('{username}', user.username)
+        .replace('{filename}', file.filename)
+        .replace('{uploads}', user.uploads.toString())
+        .replace('{date}', file.timestamp.toLocaleDateString())
+        .replace('{time}', file.timestamp.toLocaleTimeString())
+        .replace('{timestamp}', file.timestamp.toLocaleString())
+        .replace('{fakeurl}', user.settings.fakeUrl.url);
 }
+
 export {
     formatFilesize,
     formatEmbed,

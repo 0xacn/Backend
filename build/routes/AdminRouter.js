@@ -56,7 +56,7 @@ router.post('/invites', ValidationMiddleware_1.default(GenInvSchema_1.default), 
         });
         res.status(200).json({
             success: true,
-            link: `https://dny.gifts/${invite}`,
+            link: `https://clippy.gift/${invite}`,
             code: invite,
             dateCreated,
         });
@@ -104,17 +104,17 @@ router.post('/bulkinvites', ValidationMiddleware_1.default(BulkInvSchema_1.defau
                 useable: true,
             });
             if (!invites[0]) {
-                invites.push('https://dny.gifts/' + invite);
+                invites.push('https://clippy.gift/' + invite);
             }
             else {
                 invites.push(invite);
             }
         }
-        console.log(invites, invites.join('\nhttps://dny.gifts/'));
+        console.log(invites, invites.join('\nhttps://clippy.gift/'));
         var resultJSON = {
             success: true,
             codes: invites,
-            links: invites.join('\nhttps://dny.gifts/'),
+            links: invites.join('\nhttps://clippy.gift/'),
             dateCreated,
         };
         console.log(resultJSON);

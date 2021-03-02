@@ -1,4 +1,4 @@
-import { any, object, string } from 'joi';
+import {any, object, string} from 'joi';
 
 export default object({
     domain: any()
@@ -7,4 +7,4 @@ export default object({
     subdomain: string()
         .allow('')
         .optional(),
-}).options({ abortEarly: false });
+}).options({abortEarly: false});

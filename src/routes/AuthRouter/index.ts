@@ -1,9 +1,8 @@
-import { hash, verify } from 'argon2';
-import { Request, Response, Router } from 'express';
-import { sign } from 'jsonwebtoken';
-import { v4 as uuid } from 'uuid';
-import { generateString } from '../../utils/GenerateUtil';
-import { verify as verifyjwt } from 'jsonwebtoken';
+import {hash, verify} from 'argon2';
+import {Request, Response, Router} from 'express';
+import {sign, verify as verifyjwt} from 'jsonwebtoken';
+import {v4 as uuid} from 'uuid';
+import {generateString} from '../../utils/GenerateUtil';
 import ValidationMiddleware from '../../middlewares/ValidationMiddleware';
 import InviteModel from '../../models/InviteModel';
 import UserModel from '../../models/UserModel';
@@ -16,10 +15,11 @@ import PasswordResetModel from '../../models/PasswordResetModel';
 import CounterModel from '../../models/CounterModel';
 import RefreshTokenModel from '../../models/RefreshTokenModel';
 import {logPossibleAlts} from "../../utils/LoggingUtil";
+
 const router = Router();
 
 async function getNextUid() {
-    const { count } = await CounterModel.findByIdAndUpdate('counter', {
+    const {count} = await CounterModel.findByIdAndUpdate('counter', {
         $inc: {
             count: 1,
         },
@@ -40,7 +40,7 @@ router.post('/token', async (req: Request, res: Response) => {
     });
 
     try {
-        const refreshToken = await RefreshTokenModel.findOne({ token: cookie });
+        const refreshToken = await RefreshTokenModel.findOne({token: cookie});
 
         if (!refreshToken || Date.now() >= new Date(refreshToken.expires).getTime()) {
             if (refreshToken) await refreshToken.remove();
@@ -55,7 +55,7 @@ router.post('/token', async (req: Request, res: Response) => {
 
         const token: any = verifyjwt(refreshToken.token, process.env.REFRESH_TOKEN_SECRET);
 
-        const user = await UserModel.findOne({ _id: token._id })
+        const user = await UserModel.findOne({_id: token._id})
             .select('-__v -password -ips');
 
         if (!user) return res.status(401).json({
@@ -67,7 +67,7 @@ router.post('/token', async (req: Request, res: Response) => {
             lastLogin: new Date(),
         });
 
-        if(!user.settings.fakeUrl ){
+        if (!user.settings.fakeUrl) {
             await UserModel.findByIdAndUpdate(user._id, {
                 settings: {
                     ...user.settings,
@@ -79,7 +79,7 @@ router.post('/token', async (req: Request, res: Response) => {
             });
         }
 
-        const accessToken = sign({ _id: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+        const accessToken = sign({_id: user._id}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '15m'});
 
         res.status(200).json({
             success: true,
@@ -95,7 +95,7 @@ router.post('/token', async (req: Request, res: Response) => {
 });
 
 router.post('/register', ValidationMiddleware(RegisterSchema), async (req: Request, res: Response) => {
-    let { email, username, password, invite }: {
+    let {email, username, password, invite}: {
         email: string;
         username: string;
         password: string;
@@ -108,15 +108,16 @@ router.post('/register', ValidationMiddleware(RegisterSchema), async (req: Reque
     });
 
     const usernameTaken = await UserModel.findOne({
-        username: { $regex: new RegExp(username, 'i') } }
-        );
+            username: {$regex: new RegExp(username, 'i')}
+        }
+    );
 
     if (usernameTaken) return res.status(400).json({
         success: false,
         error: 'the provided username is already taken',
     });
 
-    const emailTaken = await UserModel.findOne({ email: { $regex: new RegExp(email, 'i') } });
+    const emailTaken = await UserModel.findOne({email: {$regex: new RegExp(email, 'i')}});
 
     if (emailTaken) return res.status(400).json({
         success: false,
@@ -136,7 +137,8 @@ router.post('/register', ValidationMiddleware(RegisterSchema), async (req: Reque
     });
 
     const ips = await UserModel.find(
-        { ips: req.realIp}
+        {ips: req.realIp,
+        bypassAltCheck: false,}
     );
     const ipuser = await UserModel.findOne(
         {
@@ -144,7 +146,7 @@ router.post('/register', ValidationMiddleware(RegisterSchema), async (req: Reque
             'blacklisted.status': true,
         });
 
-    if(ipuser){
+    if (ipuser) {
         return res.status(401).json({
             success: false,
             error: `you are blacklisted for a punishment related to ${ipuser.username} for: ${ipuser.blacklisted.reason}`,
@@ -152,12 +154,12 @@ router.post('/register', ValidationMiddleware(RegisterSchema), async (req: Reque
     }
 
     let invitedBy = 'Admin';
-    const inviter = await UserModel.findOne({ _id: inviteDoc.createdBy.uuid });
+    const inviter = await UserModel.findOne({_id: inviteDoc.createdBy.uuid});
 
     if (inviter) {
         invitedBy = inviter.username;
 
-        if(inviter.blacklisted.status){
+        if (inviter.blacklisted.status) {
             return res.status(400).json({
                 success: false,
                 error: 'the user you got invited by is banned',
@@ -210,7 +212,7 @@ router.post('/register', ValidationMiddleware(RegisterSchema), async (req: Reque
             registrationDate: new Date(),
             lastLogin: null,
             admin: false,
-            notifications: [],
+            bypassAltCheck: false,
             settings: {
                 domain: {
                     name: 'i.clippy.gg',
@@ -243,8 +245,8 @@ router.post('/register', ValidationMiddleware(RegisterSchema), async (req: Reque
         });
 
         await user.save();
-        if (ips.length >= 1){
-            await logPossibleAlts(ips, user);
+        if (ips.length >= 1) {
+            await logPossibleAlts(ips, user, true);
         }
 
 
@@ -261,12 +263,12 @@ router.post('/register', ValidationMiddleware(RegisterSchema), async (req: Reque
 });
 
 router.post('/login', ValidationMiddleware(LoginSchema), async (req: Request, res: Response) => {
-    const { username, password }: {
+    const {username, password}: {
         username: string;
         password: string;
     } = req.body;
 
-    const user = await UserModel.findOne({ username });
+    const user = await UserModel.findOne({username});
 
     if (!user || !(user.password.startsWith('$') ? await verify(user.password, password) : false)) return res.status(401).json({
         success: false,
@@ -285,11 +287,11 @@ router.post('/login', ValidationMiddleware(LoginSchema), async (req: Request, re
     const ipuser = await UserModel.findOne(
         {
             ips: req.realIp,
-            username: { $ne: user.username },
+            username: {$ne: user.username},
             'blacklisted.status': true,
         });
 
-    if(ipuser ){
+    if (ipuser) {
         return res.status(401).json({
             success: false,
             error: `you are blacklisted for a punishment related to ${ipuser.username} for: ${ipuser.blacklisted.reason}`,
@@ -298,25 +300,26 @@ router.post('/login', ValidationMiddleware(LoginSchema), async (req: Request, re
 
 
     try {
-        const passwordReset = await PasswordResetModel.findOne({ user: user._id });
+        const passwordReset = await PasswordResetModel.findOne({user: user._id});
         if (passwordReset) await passwordReset.remove();
 
         const ips = await UserModel.find(
             {
                 ips: req.realIp,
-                username: { $ne: user.username }
+                username: {$ne: user.username},
+                bypassAltCheck: false
             }
         );
-        if (ips.length >= 1){
-            await logPossibleAlts(ips, user);
+        if (ips.length >= 1) {
+            await logPossibleAlts(ips, user, false);
         }
         await UserModel.findByIdAndUpdate(user._id, {
             lastLogin: new Date(),
-            $addToSet : {
+            $addToSet: {
                 ips: req.realIp
             }
         });
-        if(!user.settings.fakeUrl ){
+        if (!user.settings.fakeUrl) {
             await UserModel.findByIdAndUpdate(user._id, {
                 settings: {
                     ...user.settings,
@@ -328,8 +331,8 @@ router.post('/login', ValidationMiddleware(LoginSchema), async (req: Request, re
             });
         }
 
-        const accessToken = sign({ _id: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
-        const refreshToken = sign({ _id: user._id }, process.env.REFRESH_TOKEN_SECRET);
+        const accessToken = sign({_id: user._id}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '15m'});
+        const refreshToken = sign({_id: user._id}, process.env.REFRESH_TOKEN_SECRET);
 
         await RefreshTokenModel.create({
             token: refreshToken,
@@ -337,7 +340,7 @@ router.post('/login', ValidationMiddleware(LoginSchema), async (req: Request, re
             expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
         });
 
-        res.cookie('x-refresh-token', refreshToken, { httpOnly: true, secure: false });
+        res.cookie('x-refresh-token', refreshToken, {httpOnly: true, secure: false});
 
         res.status(200).json({
             success: true,
@@ -361,7 +364,7 @@ router.get('/logout', async (req: Request, res: Response) => {
     });
 
     try {
-        const refreshToken = await RefreshTokenModel.findOne({ token: cookie });
+        const refreshToken = await RefreshTokenModel.findOne({token: cookie});
 
         if (!refreshToken) return res.status(401).json({
             success: false,
@@ -385,7 +388,7 @@ router.get('/logout', async (req: Request, res: Response) => {
 
 router.get('/verify', ValidationMiddleware(VerifyEmailSchema, 'query'), async (req: Request, res: Response) => {
     const key = req.query.key as string;
-    const user = await UserModel.findOne({ emailVerificationKey: key });
+    const user = await UserModel.findOne({emailVerificationKey: key});
 
     if (!user) return res.status(404).json({
         success: false,

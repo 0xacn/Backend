@@ -1,8 +1,8 @@
-import { NextFunction, Request, Response } from 'express';
+import {NextFunction, Request, Response} from 'express';
 import UserModel from '../models/UserModel';
 
 export default async (req: Request, res: Response, next: NextFunction) => {
-    let { user } = req;
+    let {user} = req;
 
     if (!user) return res.status(401).json({
         success: false,

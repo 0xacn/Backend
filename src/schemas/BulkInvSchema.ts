@@ -1,8 +1,8 @@
-import { object, string, number} from 'joi';
+import {number, object, string} from 'joi';
 
 export default object({
     executerId: string()
-    .required(),
-  count: number()
-    .required()
-}).options({ abortEarly: false });
+        .required(),
+    count: number()
+        .required()
+}).options({abortEarly: false});

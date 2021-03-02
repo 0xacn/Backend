@@ -1,6 +1,6 @@
-import { S3, Endpoint } from 'aws-sdk';
+import {Endpoint, S3} from 'aws-sdk';
 import DomainModel from '../models/DomainModel';
-import { User } from '../models/UserModel';
+import {User} from '../models/UserModel';
 import CounterModel from "../models/CounterModel";
 import Axios, {Method} from "axios";
 
@@ -33,7 +33,7 @@ async function updateStorage() {
             storageUsed += object.Size;
         }
         await CounterModel.findByIdAndUpdate('counter', {
-                storageUsed: storageUsed,
+            storageUsed: storageUsed,
         })
         setTimeout(async () => {
             await this.updateStorage();
@@ -43,13 +43,13 @@ async function updateStorage() {
     }
 }
 
-async function request(endpoint: string, method: Method, body?: object | string, headers?: object){
+async function request(endpoint: string, method: Method, body?: object | string, headers?: object) {
     try {
         const baseUrl = 'https://discord.com/api/v8';
-        const { data } = await Axios({
+        const {data} = await Axios({
             url: `${baseUrl}${endpoint}`,
             method,
-            headers: headers ? headers: null,
+            headers: headers ? headers : null,
             data: body ? body : null,
         });
 
@@ -58,6 +58,7 @@ async function request(endpoint: string, method: Method, body?: object | string,
         throw new Error("Couldn't link your discord. Please make sure you are not in the 100 server limit");
     }
 }
+
 async function addPremium(user: User) {
     await this.request(`/guilds/${process.env.DISCORD_SERVER_ID}/members/${user.discord.id}/roles/806106770212126730`, 'PUT',
         null, {
@@ -65,13 +66,14 @@ async function addPremium(user: User) {
         }
     );
 }
+
 /**
  * Wipe a user's files.
  * @param {user} user The user's files to wipe.
  * @param {string} dir The directory to delete.
  */
 async function wipeFiles(user: User, dir: string = `${user._id}/`) {
-    const domains = await DomainModel.find({ userOnly: true, donatedBy: user._id });
+    const domains = await DomainModel.find({userOnly: true, donatedBy: user._id});
     let count: number = 0;
 
     while (true) {
@@ -94,8 +96,8 @@ async function wipeFiles(user: User, dir: string = `${user._id}/`) {
                         },
                     };
 
-                    for (const { Key } of domainObjects.Contents) {
-                        deleteParams.Delete.Objects.push({ Key });
+                    for (const {Key} of domainObjects.Contents) {
+                        deleteParams.Delete.Objects.push({Key});
                     }
 
                     const deleted = await s3.deleteObjects(deleteParams).promise();
@@ -116,8 +118,8 @@ async function wipeFiles(user: User, dir: string = `${user._id}/`) {
                 },
             };
 
-            for (const { Key } of objects.Contents) {
-                deleteParams.Delete.Objects.push({ Key });
+            for (const {Key} of objects.Contents) {
+                deleteParams.Delete.Objects.push({Key});
             }
 
             const deleted = await s3.deleteObjects(deleteParams).promise();

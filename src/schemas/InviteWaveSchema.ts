@@ -1,6 +1,6 @@
-import {object, number} from 'joi';
+import {number, object} from 'joi';
 
 export default object({
     amount: number()
         .required(),
-}).options({ abortEarly: false });
+}).options({abortEarly: false});

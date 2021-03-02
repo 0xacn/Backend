@@ -1,4 +1,4 @@
-import { object, string } from 'joi';
+import {object, string} from 'joi';
 
 export default object({
     username: string()
@@ -11,4 +11,4 @@ export default object({
         .min(5)
         .max(60)
         .required(),
-}).options({ abortEarly: false });
+}).options({abortEarly: false});

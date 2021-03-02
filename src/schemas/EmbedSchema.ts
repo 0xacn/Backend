@@ -1,4 +1,4 @@
-import { boolean, object, string } from 'joi';
+import {boolean, object, string} from 'joi';
 
 export default object({
     color: string()
@@ -21,4 +21,4 @@ export default object({
 
     randomColor: boolean()
         .optional(),
-}).options({ abortEarly: false });
+}).options({abortEarly: false});

@@ -1,5 +1,5 @@
-import { NextFunction, Request, Response } from 'express';
-import { ArraySchema, ObjectSchema } from 'joi';
+import {NextFunction, Request, Response} from 'express';
+import {ArraySchema, ObjectSchema} from 'joi';
 
 export default (schema: ObjectSchema | ArraySchema, property: 'body' | 'query' = 'body') => {
     return async (req: Request, res: Response, next: NextFunction) => {

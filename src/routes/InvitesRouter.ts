@@ -1,13 +1,14 @@
-import { Request, Response, Router } from 'express';
+import {Request, Response, Router} from 'express';
 import AdminMiddleware from '../middlewares/AdminMiddleware';
 import AuthMiddleware from '../middlewares/AuthMiddleware';
 import InviteModel from '../models/InviteModel';
 import UserModel from '../models/UserModel';
-import { generateInvite } from '../utils/GenerateUtil';
+import {generateInvite} from '../utils/GenerateUtil';
+
 const router = Router();
 
 router.post('/', AuthMiddleware, async (req: Request, res: Response) => {
-    const { user } = req;
+    const {user} = req;
 
     if (user.invites <= 0 && !user.admin) return res.status(401).json({
         success: false,
@@ -36,7 +37,7 @@ router.post('/', AuthMiddleware, async (req: Request, res: Response) => {
 
     res.status(200).json({
         success: true,
-        link: `https://clippy.gg/?code=${invite}`,
+        link: `https://clippy.gift/${invite}`,
         code: invite,
         dateCreated,
     });
@@ -48,10 +49,10 @@ router.get('/', AdminMiddleware, async (_req: Request, res: Response) => {
     const invites = await InviteModel.find({})
         .select('-__v');
 
-    const redeemedInvites = await InviteModel.find({ redeemed: true })
+    const redeemedInvites = await InviteModel.find({redeemed: true})
         .select('-__v');
 
-    const unusableInvites = await InviteModel.find({ useable: false })
+    const unusableInvites = await InviteModel.find({useable: false})
         .select('-__v');
 
     res.json({
@@ -64,7 +65,7 @@ router.get('/', AdminMiddleware, async (_req: Request, res: Response) => {
 });
 
 router.get('/:code', AdminMiddleware, async (req: Request, res: Response) => {
-    const { code } = req.params;
+    const {code} = req.params;
 
     const invite = await InviteModel.findById(code)
         .select('-__v');
@@ -81,7 +82,7 @@ router.get('/:code', AdminMiddleware, async (req: Request, res: Response) => {
 });
 
 router.delete('/:code', AdminMiddleware, async (req: Request, res: Response) => {
-    const { code } = req.params;
+    const {code} = req.params;
 
     const invite = await InviteModel.findById(code);
 

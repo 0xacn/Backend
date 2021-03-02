@@ -1,5 +1,5 @@
-import { NextFunction, Request, Response } from 'express';
-import { verify } from 'jsonwebtoken';
+import {NextFunction, Request, Response} from 'express';
+import {verify} from 'jsonwebtoken';
 
 export default (req: Request, _res: Response, next: NextFunction) => {
     // terrible, I know

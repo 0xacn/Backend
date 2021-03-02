@@ -1,13 +1,14 @@
-import { Request, Response, Router } from 'express';
-import PasswordResetModel, { PasswordReset } from '../../models/PasswordResetModel';
+import {Request, Response, Router} from 'express';
+import PasswordResetModel, {PasswordReset} from '../../models/PasswordResetModel';
 import ValidationMiddleware from '../../middlewares/ValidationMiddleware';
 import PasswordResetConfirmationSchema from '../../schemas/PasswordResetConfirmationSchema';
-import UserModel, { User } from '../../models/UserModel';
-import { generateString } from '../../utils/GenerateUtil';
+import UserModel, {User} from '../../models/UserModel';
+import {generateString} from '../../utils/GenerateUtil';
 import PasswordResetSchema from '../../schemas/PasswordResetSchema';
-import { hash, verify } from 'argon2';
+import {hash, verify} from 'argon2';
 import RefreshTokenModel from '../../models/RefreshTokenModel';
 import {sendPasswordReset} from "../../utils/MailUtil";
+
 const router = Router();
 
 router.post('/send', ValidationMiddleware(PasswordResetConfirmationSchema), async (req: Request, res: Response) => {
@@ -16,15 +17,15 @@ router.post('/send', ValidationMiddleware(PasswordResetConfirmationSchema), asyn
         error: 'you are already logged in',
     });
 
-    const { email } = req.body;
-    let user: PasswordReset | User = await PasswordResetModel.findOne({ email });
+    const {email} = req.body;
+    let user: PasswordReset | User = await PasswordResetModel.findOne({email});
 
     if (user) return res.status(400).json({
         success: false,
         error: 'you already have a ongoing password reset',
     });
 
-    user = await UserModel.findOne({ email });
+    user = await UserModel.findOne({email});
 
     const resetKey = generateString(40);
 
@@ -56,14 +57,14 @@ router.post('/send', ValidationMiddleware(PasswordResetConfirmationSchema), asyn
 });
 
 router.post('/reset', ValidationMiddleware(PasswordResetSchema), async (req: Request, res: Response) => {
-    let { user } = req;
+    let {user} = req;
 
     if (user) return res.status(400).json({
         success: false,
         error: 'you are already logged in',
     });
 
-    const { key, password, confirmPassword } = req.body;
+    const {key, password, confirmPassword} = req.body;
     const reset = await PasswordResetModel.findById(key);
 
     if (!reset) return res.status(404).json({
@@ -95,7 +96,7 @@ router.post('/reset', ValidationMiddleware(PasswordResetSchema), async (req: Req
     });
 
     try {
-        await RefreshTokenModel.deleteMany({ user: user._id });
+        await RefreshTokenModel.deleteMany({user: user._id});
 
         await UserModel.findByIdAndUpdate(user._id, {
             password: await hash(password),
@@ -116,7 +117,7 @@ router.post('/reset', ValidationMiddleware(PasswordResetSchema), async (req: Req
 });
 
 router.get('/:key', async (req: Request, res: Response) => {
-    const { key } = req.params;
+    const {key} = req.params;
     const doc = await PasswordResetModel.findById(key);
 
     if (!doc) return res.status(404).json({

@@ -1,5 +1,5 @@
-import { Request, Response, Router } from 'express';
-import { generateString } from '../utils/GenerateUtil';
+import {Request, Response, Router} from 'express';
+import {generateString} from '../utils/GenerateUtil';
 import UploadMiddleware from '../middlewares/UploadMiddleware';
 import ValidationMiddleware from '../middlewares/ValidationMiddleware';
 import ShortenerModel from '../models/ShortenerModel';
@@ -7,23 +7,16 @@ import UserModel from '../models/UserModel';
 import ConfigSchema from '../schemas/ConfigSchema';
 import DeletionSchema from '../schemas/DeletionSchema';
 import ShortenerSchema from '../schemas/ShortenerSchema';
-import ipLoggers from '../utils/IPLoggers.json';
 import AuthMiddleware from '../middlewares/AuthMiddleware';
+import {isMalicious} from "../utils/SafetyUtils";
+
 const router = Router();
 
-function isIpLogger(url: string) {
-    for (const ipLogger of ipLoggers) {
-        if (url.match(new RegExp(ipLogger, 'i'))) return true;
-    }
-
-    return false;
-}
-
 router.get('/urls', AuthMiddleware, async (req: Request, res: Response) => {
-    const { user } = req;
+    const {user} = req;
 
     try {
-        const urls = await ShortenerModel.find({ user: user._id })
+        const urls = await ShortenerModel.find({user: user._id})
             .select('-_id -__v');
 
         res.status(200).json({
@@ -40,10 +33,10 @@ router.get('/urls', AuthMiddleware, async (req: Request, res: Response) => {
 });
 
 router.post('/', UploadMiddleware, ValidationMiddleware(ShortenerSchema), async (req: Request, res: Response) => {
-    const { user } = req;
-    const { url } = req.body;
+    const {user} = req;
+    const {url} = req.body;
 
-    if (isIpLogger(url)) {
+    if (await isMalicious(url)) {
         if (user.strikes === 3 || user.strikes + 1 === 3) {
             await UserModel.findByIdAndUpdate(user._id, {
                 blacklisted: {
@@ -55,7 +48,7 @@ router.post('/', UploadMiddleware, ValidationMiddleware(ShortenerSchema), async 
 
             res.status(400).json({
                 success: false,
-                error: 'you have been suspended by auto-mod, create a ticket in the server to appeal',
+                error: 'you have been suspended by auto-mod, create a ticket in the discord to appeal',
             });
 
             return;
@@ -76,10 +69,10 @@ router.post('/', UploadMiddleware, ValidationMiddleware(ShortenerSchema), async 
     }
 
     try {
-        const { domain } = user.settings;
+        const {domain} = user.settings;
         const longUrl = req.headers.longurl ? req.headers.longurl === 'true' : user.settings.longUrl;
 
-        const shortId = longUrl ? generateString(17): generateString(10);
+        const shortId = longUrl ? generateString(17) : generateString(10);
 
         const baseUrl = req.headers.domain ?
             req.headers.domain :
@@ -101,7 +94,7 @@ router.post('/', UploadMiddleware, ValidationMiddleware(ShortenerSchema), async 
             success: true,
             shortendUrl,
             deletionUrl,
-            document: await ShortenerModel.findOne({ shortId }).select('-_id -__v'),
+            document: await ShortenerModel.findOne({shortId}).select('-_id -__v'),
         });
     } catch (err) {
         res.status(500).json({
@@ -113,7 +106,7 @@ router.post('/', UploadMiddleware, ValidationMiddleware(ShortenerSchema), async 
 
 router.get('/delete', ValidationMiddleware(DeletionSchema, 'query'), async (req: Request, res: Response) => {
     const deletionKey = req.query.key as string;
-    const shortened = await ShortenerModel.findOne({ deletionKey });
+    const shortened = await ShortenerModel.findOne({deletionKey});
 
     if (!shortened) return res.status(404).json({
         success: false,
@@ -137,7 +130,7 @@ router.get('/delete', ValidationMiddleware(DeletionSchema, 'query'), async (req:
 
 router.get('/config', ValidationMiddleware(ConfigSchema, 'query'), async (req: Request, res: Response) => {
     const key = req.query.key as string;
-    const user = await UserModel.findOne({ key });
+    const user = await UserModel.findOne({key});
 
     if (!user) return res.status(401).json({
         success: false,

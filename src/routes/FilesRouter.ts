@@ -1,23 +1,24 @@
-import { Request, Response, Router } from 'express';
-import { upload } from '../utils/MulterUtil';
-import { s3, wipeFiles } from '../utils/S3Util';
+import {Request, Response, Router} from 'express';
+import {upload} from '../utils/MulterUtil';
+import {s3, wipeFiles} from '../utils/S3Util';
 import {formatEmbed, formatFakeUrl, formatFilesize} from '../utils/FormatUtil';
-import { generateString, generateInvisibleId } from '../utils/GenerateUtil';
-import { DocumentType } from '@typegoose/typegoose';
-import { PassThrough } from 'stream';
+import {generateInvisibleId, generateString} from '../utils/GenerateUtil';
+import {DocumentType} from '@typegoose/typegoose';
+import {PassThrough} from 'stream';
 import UploadMiddleware from '../middlewares/UploadMiddleware';
-import FileModel, { File } from '../models/FileModel';
-import UserModel, { User } from '../models/UserModel';
+import FileModel, {File} from '../models/FileModel';
+import UserModel, {User} from '../models/UserModel';
 import InvisibleUrlModel from '../models/InvisibleUrlModel';
 import ValidationMiddleware from '../middlewares/ValidationMiddleware';
 import DeletionSchema from '../schemas/DeletionSchema';
 import ConfigSchema from '../schemas/ConfigSchema';
 import AuthMiddleware from '../middlewares/AuthMiddleware';
 import Archiver from 'archiver';
-import { extname } from 'path';
+import {extname} from 'path';
 import CounterModel from "../models/CounterModel";
-import { sendFileArchive } from '../utils/MailUtil';
+import {sendFileArchive} from '../utils/MailUtil';
 import AdminAuthMiddleware from "../middlewares/AdminAuthMiddleware";
+
 const rateLimit = require("express-rate-limit");
 
 const allowedFileTypes = ['png', 'jpg', 'jpeg', 'gif', 'tiff', 'raw', 'mp3', 'mp4'];
@@ -29,11 +30,11 @@ const fileLimiter = rateLimit({
     headers: false,
 });
 
-router.get('/', AdminAuthMiddleware,async (_req: Request, res: Response) => {
+router.get('/', AdminAuthMiddleware, async (_req: Request, res: Response) => {
     try {
         const total = await FileModel.countDocuments();
         const invisibleUrls = await InvisibleUrlModel.countDocuments();
-        const { storageUsed } = await CounterModel.findById('counter');
+        const {storageUsed} = await CounterModel.findById('counter');
         res.status(200).json({
             success: true,
             total,
@@ -48,7 +49,7 @@ router.get('/', AdminAuthMiddleware,async (_req: Request, res: Response) => {
     }
 });
 
-router.post('/',fileLimiter, UploadMiddleware, upload.single('file'), async (req: Request, res: Response) => {
+router.post('/', fileLimiter, UploadMiddleware, upload.single('file'), async (req: Request, res: Response) => {
     let {
         file,
         user,
@@ -73,7 +74,7 @@ router.post('/',fileLimiter, UploadMiddleware, upload.single('file'), async (req
         error: `your file is too large, your upload limit is: ${user.premium ? '100' : '15'} MB`
     });
 
-    const { domain, randomDomain, embed, showLink, invisibleUrl, fakeUrl } = user.settings;
+    const {domain, randomDomain, embed, showLink, invisibleUrl, fakeUrl} = user.settings;
 
     let baseUrl = req.headers.domain ?
         req.headers.domain :
@@ -122,14 +123,14 @@ router.post('/',fileLimiter, UploadMiddleware, upload.single('file'), async (req
         imageUrl = `https://${baseUrl}/${invisibleUrlId}`;
     }
     if (fakeUrl && fakeUrl.enabled) {
-        imageUrl = (isValidHttpUrl(formatFakeUrl(fakeUrl.url, user, file)) ? "<" + formatFakeUrl(fakeUrl.url, user, file) + ">" : formatFakeUrl(fakeUrl.url, user, file)) + "||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​|| "+ imageUrl;
+        imageUrl = (isValidHttpUrl(formatFakeUrl(fakeUrl.url, user, file)) ? "<" + formatFakeUrl(fakeUrl.url, user, file) + ">" : formatFakeUrl(fakeUrl.url, user, file)) + "||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​|| " + imageUrl;
     }
 
     await UserModel.findByIdAndUpdate(user._id, {
         $inc: {
             uploads: +1,
         },
-        $addToSet : {
+        $addToSet: {
             ips: req.realIp
         }
     });
@@ -139,6 +140,7 @@ router.post('/',fileLimiter, UploadMiddleware, upload.single('file'), async (req
         deletionUrl,
     });
 });
+
 function isValidHttpUrl(string) {
     let url;
 
@@ -150,9 +152,10 @@ function isValidHttpUrl(string) {
 
     return url.protocol === "http:" || url.protocol === "https:";
 }
+
 router.get('/delete', ValidationMiddleware(DeletionSchema, 'query'), async (req: Request, res: Response) => {
     const deletionKey = req.query.key as string;
-    const file = await FileModel.findOne({ deletionKey });
+    const file = await FileModel.findOne({deletionKey});
 
     if (!file) return res.status(404).json({
         success: false,
@@ -190,10 +193,10 @@ router.get('/delete', ValidationMiddleware(DeletionSchema, 'query'), async (req:
 });
 
 router.delete('/:id', AuthMiddleware, async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const { user } = req;
+    const {id} = req.params;
+    const {user} = req;
 
-    const file = await FileModel.findOne({ filename: id });
+    const file = await FileModel.findOne({filename: id});
 
     if (!file) return res.status(404).json({
         success: false,
@@ -233,7 +236,7 @@ router.delete('/:id', AuthMiddleware, async (req: Request, res: Response) => {
 });
 
 router.post('/wipe', AuthMiddleware, async (req: Request, res: Response) => {
-    const { user } = req;
+    const {user} = req;
 
     try {
         const count = await wipeFiles(user);
@@ -265,7 +268,7 @@ router.post('/wipe', AuthMiddleware, async (req: Request, res: Response) => {
 
 router.get('/config', ValidationMiddleware(ConfigSchema, 'query'), async (req: Request, res: Response) => {
     const key = req.query.key as string;
-    const user = await UserModel.findOne({ key });
+    const user = await UserModel.findOne({key});
 
     if (!user) return res.status(401).json({
         success: false,
@@ -310,7 +313,7 @@ function writeStream(key: string) {
 }
 
 router.get('/archive', AuthMiddleware, async (req: Request, res: Response) => {
-    const { user } = req;
+    const {user} = req;
 
     if (user.uploads <= 0) return res.status(400).json({
         success: false,
@@ -343,12 +346,12 @@ router.get('/archive', AuthMiddleware, async (req: Request, res: Response) => {
         const objects = await s3.listObjectsV2(params).promise();
         const streams = objects.Contents.map((object) => {
             return {
-                stream: s3.getObject({ Bucket: process.env.S3_BUCKET, Key: object.Key }).createReadStream(),
+                stream: s3.getObject({Bucket: process.env.S3_BUCKET, Key: object.Key}).createReadStream(),
                 object: object,
             };
         });
 
-        const { passThrough, uploaded } = writeStream(`${user._id}/${generateString(5)}.zip`);
+        const {passThrough, uploaded} = writeStream(`${user._id}/${generateString(5)}.zip`);
 
         await new Promise((resolve, reject) => {
             const archive = Archiver('zip');
@@ -380,10 +383,10 @@ router.get('/archive', AuthMiddleware, async (req: Request, res: Response) => {
             throw new Error(err);
         });
 
-        const { Key } = await uploaded.promise();
+        const {Key} = await uploaded.promise();
         const Location = `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET}/${Key}`;
 
-        await sendFileArchive(user, s3.getObject({ Bucket: process.env.S3_BUCKET, Key }).createReadStream());
+        await sendFileArchive(user, s3.getObject({Bucket: process.env.S3_BUCKET, Key}).createReadStream());
 
         await UserModel.findByIdAndUpdate(user._id, {
             lastFileArchive: new Date(),

@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
-import { User } from '../src/models/UserModel';
-import { OAuth } from '../src/utils/OAuthUtil';
+import {User} from '../src/models/UserModel';
+import {OAuth} from '../src/utils/OAuthUtil';
 
 declare global {
     namespace Express {

@@ -1,4 +1,4 @@
-import { Request, Response, Router } from 'express';
+import {Request, Response, Router} from 'express';
 import ms from 'ms';
 import ValidationMiddleware from '../../middlewares/ValidationMiddleware';
 import DomainModel from '../../models/DomainModel';
@@ -10,17 +10,18 @@ import PreferencesSchema from '../../schemas/PreferencesSchema';
 import RandomDomainSchema from '../../schemas/RandomDomainSchema';
 import UpdateDomainSchema from '../../schemas/UpdateDomainSchema';
 import WipeIntervalSchema from '../../schemas/WipeIntervalSchema';
-import { delInterval, intervals } from '../../utils/Intervals';
-import { wipeFiles } from '../../utils/S3Util';
+import {delInterval, intervals} from '../../utils/Intervals';
+import {wipeFiles} from '../../utils/S3Util';
 import FakeUrlSchema from "../../schemas/FakeUrlSchema";
+
 const router = Router();
 
 router.put('/domain', ValidationMiddleware(UpdateDomainSchema), async (req: Request, res: Response) => {
-    const { user } = req;
-    let { domain, subdomain } = req.body;
+    const {user} = req;
+    let {domain, subdomain} = req.body;
 
     try {
-        const validDomain = await DomainModel.findOne({ name: domain });
+        const validDomain = await DomainModel.findOne({name: domain});
 
         if (!validDomain) return res.status(400).json({
             success: false,
@@ -54,9 +55,9 @@ router.put('/domain', ValidationMiddleware(UpdateDomainSchema), async (req: Requ
 });
 
 router.post('/random_domain', ValidationMiddleware(RandomDomainSchema), async (req: Request, res: Response) => {
-    const { user } = req;
-    const { domain } = req.body;
-    const { domains } = user.settings.randomDomain;
+    const {user} = req;
+    const {domain} = req.body;
+    const {domains} = user.settings.randomDomain;
 
     try {
         if (domains.find((d) => d === domain)) return res.status(400).json({
@@ -83,9 +84,9 @@ router.post('/random_domain', ValidationMiddleware(RandomDomainSchema), async (r
 });
 
 router.delete('/random_domain', ValidationMiddleware(RandomDomainSchema), async (req: Request, res: Response) => {
-    const { user } = req;
-    const { domain } = req.body;
-    const { domains } = user.settings.randomDomain;
+    const {user} = req;
+    const {domain} = req.body;
+    const {domains} = user.settings.randomDomain;
 
     try {
         if (!domains.find((d) => d === domain)) return res.status(404).json({
@@ -110,7 +111,7 @@ router.delete('/random_domain', ValidationMiddleware(RandomDomainSchema), async 
 });
 
 router.put('/preferences', ValidationMiddleware(PreferencesSchema), async (req: Request, res: Response) => {
-    const { user } = req;
+    const {user} = req;
 
     try {
         const toUpdate: any = {};
@@ -147,7 +148,8 @@ router.put('/preferences', ValidationMiddleware(PreferencesSchema), async (req: 
                                 await UserModel.findByIdAndUpdate(user._id, {
                                     uploads: 0,
                                 });
-                            } catch (err) {}
+                            } catch (err) {
+                            }
                         }, user.settings.autoWipe.interval);
 
                         intervals.push({
@@ -182,8 +184,8 @@ router.put('/preferences', ValidationMiddleware(PreferencesSchema), async (req: 
 });
 
 router.put('/embed', ValidationMiddleware(EmbedSchema), async (req: Request, res: Response) => {
-    const { color, title, description, author, randomColor } = req.body;
-    const { user } = req;
+    const {color, title, description, author, randomColor} = req.body;
+    const {user} = req;
 
     try {
         await UserModel.findByIdAndUpdate(user._id, {
@@ -212,8 +214,8 @@ router.put('/embed', ValidationMiddleware(EmbedSchema), async (req: Request, res
     }
 });
 router.put('/fakeUrl', ValidationMiddleware(FakeUrlSchema), async (req: Request, res: Response) => {
-    const { url } = req.body;
-    const { user } = req;
+    const {url} = req.body;
+    const {user} = req;
 
     try {
         await UserModel.findByIdAndUpdate(user._id, {
@@ -239,8 +241,8 @@ router.put('/fakeUrl', ValidationMiddleware(FakeUrlSchema), async (req: Request,
 });
 
 router.put('/wipe_interval', ValidationMiddleware(WipeIntervalSchema), async (req: Request, res: Response) => {
-    const { value } = req.body;
-    const { user } = req;
+    const {value} = req.body;
+    const {user} = req;
 
     try {
         const validIntervals = [ms('1h'), ms('2h'), ms('12h'), ms('24h'), ms('1w'), ms('2w'), 2147483647];
@@ -274,7 +276,8 @@ router.put('/wipe_interval', ValidationMiddleware(WipeIntervalSchema), async (re
                     await UserModel.findByIdAndUpdate(user._id, {
                         uploads: 0,
                     });
-                } catch (err) {}
+                } catch (err) {
+                }
             }, value);
 
             intervals.push({

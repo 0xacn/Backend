@@ -1,4 +1,4 @@
-import { array, boolean, object, string } from 'joi';
+import {array, boolean, object, string} from 'joi';
 
 export default array().items(object({
     name: string()
@@ -12,4 +12,4 @@ export default array().items(object({
     donatedBy: string(),
 
     userOnly: boolean(),
-}).options({ abortEarly: false }));
+}).options({abortEarly: false}));

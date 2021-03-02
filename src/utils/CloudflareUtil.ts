@@ -1,4 +1,4 @@
-import Axios, { Method } from 'axios';
+import Axios, {Method} from 'axios';
 
 export default new class CloudflareUtil {
     /**
@@ -10,7 +10,7 @@ export default new class CloudflareUtil {
     async request(endpoint: string, method: Method, body?: object) {
         try {
             const baseUrl = 'https://api.cloudflare.com/client/v4';
-            const { data } = await Axios({
+            const {data} = await Axios({
                 url: `${baseUrl}${endpoint}`,
                 method,
                 headers: {
@@ -51,8 +51,8 @@ export default new class CloudflareUtil {
      * @param {string} domain The domain to delete.
      */
     async deleteZone(domain: string) {
-        const { result } = await this.request(`/zones?name=${domain}`, 'GET');
-        const { id } = result[0];
+        const {result} = await this.request(`/zones?name=${domain}`, 'GET');
+        const {id} = result[0];
 
         await this.request(`/zones/${id}`, 'DELETE');
     }

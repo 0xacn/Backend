@@ -1,9 +1,9 @@
-import { NextFunction, Request, Response } from 'express';
-import { OAuth } from '../utils/OAuthUtil';
+import {NextFunction, Request, Response} from 'express';
+import {OAuth} from '../utils/OAuthUtil';
 
 export default (request: string = 'login') => {
     return async (req: Request, res: Response, next: NextFunction) => {
-        const { code } = req.query;
+        const {code} = req.query;
         const discord = new OAuth(code as string);
 
         try {

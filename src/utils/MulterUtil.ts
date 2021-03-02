@@ -1,8 +1,8 @@
-import { Request } from 'express';
-import { formatExtension } from './FormatUtil';
-import { generateString } from './GenerateUtil';
-import { s3 } from './S3Util';
-import multer, { Multer } from 'multer';
+import {Request} from 'express';
+import {formatExtension} from './FormatUtil';
+import {generateString} from './GenerateUtil';
+import {s3} from './S3Util';
+import multer, {Multer} from 'multer';
 import MulterS3 from 'multer-s3';
 import DomainModel from '../models/DomainModel';
 
@@ -19,9 +19,9 @@ const upload: Multer = multer({
             if (!req.user) return;
 
             let key = req.user._id;
-            const { longUrl, domain } = req.user.settings;
-            const document = await DomainModel.findOne({ name: domain.name });
-            const filename = (longUrl ? generateString(17): generateString(7)) + formatExtension(file);	
+            const {longUrl, domain} = req.user.settings;
+            const document = await DomainModel.findOne({name: domain.name});
+            const filename = (longUrl ? generateString(17) : generateString(7)) + formatExtension(file);
 
             if (document.userOnly) {
                 file.userOnlyDomain = true;

@@ -1,4 +1,4 @@
-import { object, string, number } from 'joi';
+import {number, object, string} from 'joi';
 
 export default object({
     id: string()
@@ -6,4 +6,4 @@ export default object({
 
     amount: number()
         .required(),
-}).options({ abortEarly: false });
+}).options({abortEarly: false});
