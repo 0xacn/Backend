@@ -26,9 +26,7 @@ router.get('/', AdminAuthMiddleware, async (req: Request, res: Response) => {
         }).select('-__v -_id -donatedBy').lean()).concat(domains);
 
         for (let i = 0; i < domains.length; i++) {
-            const users = await UserModel.countDocuments({'settings.domain.name': domains[i].name});
-
-            domains[i].users = users;
+            domains[i].users = await UserModel.countDocuments({'settings.domain.name': domains[i].name});
         }
 
         res.status(200).json({
