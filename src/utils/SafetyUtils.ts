@@ -23,11 +23,16 @@ async function isVPN(ip: string) {
 }
 
 async function isMalicious(url: string) {
-    let domain = (new URL(url)).hostname.replace('www.','');
-    for (const ipLogger of ipLoggers) {
-        if (domain.match(new RegExp(ipLogger, 'i'))) return true;
+    try {
+        let domain = (new URL(url)).hostname.replace('www.', '');
+        for (const ipLogger of ipLoggers) {
+            if (domain.match(new RegExp(ipLogger, 'i'))) return true;
+        }
+        return await lookup.checkSingle('http://' + domain + '/');
     }
-    return await lookup.checkSingle('http://' + domain + '/');
+    catch (e){
+        return false;
+    }
 }
 
 export {
