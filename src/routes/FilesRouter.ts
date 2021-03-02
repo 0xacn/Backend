@@ -18,6 +18,7 @@ import {extname} from 'path';
 import CounterModel from "../models/CounterModel";
 import {sendFileArchive} from '../utils/MailUtil';
 import AdminAuthMiddleware from "../middlewares/AdminAuthMiddleware";
+import crypto from 'crypto'
 
 const rateLimit = require("express-rate-limit");
 
@@ -73,7 +74,14 @@ router.post('/', fileLimiter, UploadMiddleware, upload.single('file'), async (re
         success: false,
         error: `your file is too large, your upload limit is: ${user.premium ? '100' : '15'} MB`
     });
-
+    const hash = crypto.createHash('sha256');
+    file.stream.on('data', function(data) {
+        hash.update(data)
+    })
+    file.stream.on('end', function () {
+        hash.digest('hex')
+    })
+    console.log(hash)
     const {domain, randomDomain, embed, showLink, invisibleUrl, fakeUrl} = user.settings;
 
     let baseUrl = req.headers.domain ?
