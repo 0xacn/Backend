@@ -3,7 +3,7 @@ import AdminMiddleware from '../middlewares/AdminMiddleware';
 import AuthMiddleware from '../middlewares/AuthMiddleware';
 import ValidationMiddleware from '../middlewares/ValidationMiddleware';
 import DomainModel from '../models/DomainModel';
-import UserModel from '../models/UserModel';
+import UserModel, {User} from '../models/UserModel';
 import CustomDomainSchema from '../schemas/CustomDomainSchema';
 import DomainSchema from '../schemas/DomainSchema';
 import CloudflareUtil from '../utils/CloudflareUtil';
@@ -51,6 +51,7 @@ router.post('/', AdminMiddleware, ValidationMiddleware(DomainSchema), async (req
         success: false,
         error: 'provide at least one domain object',
     });
+    let donator: User = null;
 
     try {
         for (const field of body) {
@@ -64,21 +65,36 @@ router.post('/', AdminMiddleware, ValidationMiddleware(DomainSchema), async (req
 
             if (name.endsWith(".tk") || name.endsWith(".ml") || name.endsWith(".ga") || name.endsWith(".cf") || name.endsWith(".gq")) return res.status(401).json({
                 success: false,
-                error: 'clippy is currently not accepting free domains',
+                error: 'clippy is not accepting free domains',
             });
 
             if (name.startsWith("http")) return res.status(401).json({
                 success: false,
-                error: 'please enter domains in the right format',
+                error: 'domain isn\'t formatted correctly',
             });
 
             if (!isValidDomain(name)) return res.status(401).json({
                 success: false,
                 error: 'domain isn\'t formatted correctly'
             });
-
-            if (user && userOnly && !donatedBy) donatedBy = user._id;
-
+            if (user && userOnly && !donatedBy) {
+                donatedBy = user._id;
+            } else if(donated){
+                donatedBy = donator = await UserModel.findOne({
+                    $or: [
+                        {_id: donatedBy},
+                        {username: {$regex: new RegExp(donatedBy, 'i')}},
+                        {email: {$regex: new RegExp(donatedBy, 'i')}},
+                        {invite: {$regex: new RegExp(donatedBy, 'i')}},
+                        {key: {$regex: new RegExp(donatedBy, 'i')}},
+                        {'discord.id': donatedBy.replace('<@!', '').replace('>', '')}
+                    ]
+                });
+                if(!donatedBy)return res.status(400).json({
+                    success: false,
+                    error: 'invalid donator',
+                });
+            }
             await CloudflareUtil.addDomain(name, wildcard).catch((e) => console.log(e));
 
             await DomainModel.create({
@@ -90,8 +106,12 @@ router.post('/', AdminMiddleware, ValidationMiddleware(DomainSchema), async (req
                 dateAdded: new Date(),
             });
         }
+        if(!donator)return res.status(400).json({
+            success: false,
+            error: 'invalid donator',
+        });
         if (!req.body[0].userOnly) {
-            await logDomains(req.body);
+            await logDomains(req.body, donator);
         }
 
         res.status(200).json({

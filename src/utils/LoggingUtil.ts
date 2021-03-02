@@ -5,16 +5,16 @@ import {User} from "../models/UserModel";
 /**
  * Log a list of new domains to the domain notifications channel.
  * @param {Domain[]} domains The domain that was created.
- * @param {string} donatedby The name of donator
+ * @param {User} donatedby The donator
  */
-async function logDomains(domains: Domain[], donatedby :string) {
+async function logDomains(domains: Domain[], donatedby :User) {
     const grammar = domains.length > 1 ? `**${domains.length}** new domains have` : 'A new domain has';
     const domainList = domains.map((d) => (d.wildcard ? '*.' : '') + d.name).join(',\n');
 
     await Axios.post(process.env.WEBHOOK_URL, {
         embeds: [
             {
-                title: `${grammar} been ${donatedby ? "added" : ("donated by: " + donatedby)}, DNS records have automatically been updated.`,
+                title: `${grammar} been ${donatedby ? "added" : ("donated by: " + donatedby.username + ` ( <@${donatedby.discord.id}> )`)}, DNS records have automatically been updated.`,
                 description: `\`\`\`${domainList}\`\`\``
             },
         ],
