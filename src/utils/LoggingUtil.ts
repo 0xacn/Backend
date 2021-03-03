@@ -14,8 +14,17 @@ async function logDomains(domains: Domain[], donatedby :User) {
     await Axios.post(process.env.WEBHOOK_URL, {
         embeds: [
             {
-                title: `${grammar} been ${donatedby ? "added" : ("donated by: " + donatedby.username + ` ( <@${donatedby.discord.id}> )`)}, DNS records have automatically been updated.`,
-                description: `\`\`\`${domainList}\`\`\``
+                description: `${grammar} been ${donatedby ? "added" : ("donated by: " + donatedby.username + ` ( <@${donatedby.discord.id}> )`)}, DNS records have automatically been updated.`,
+                fields: [
+                    {
+                        name: 'Domains',
+                        value: `\`\`\`${domainList}\`\`\``,
+                    },
+                    {
+                        name: 'Donated By:',
+                        value: donatedby ? `Official Domain ${domains.length > 1 ? "s" : ""}` : `${donatedby.username} ( <@${donatedby.discord.id}> )`,
+                    },
+                ],
             },
         ],
     });
