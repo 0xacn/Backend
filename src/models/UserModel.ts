@@ -103,6 +103,12 @@ export class User {
     strikes: number;
 
     /**
+     * If the users account is disabled
+     */
+    @prop()
+    disabled!: boolean;
+
+    /**
      * The user's blacklist status and reason.
      */
     @prop()

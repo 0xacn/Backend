@@ -200,6 +200,7 @@ router.post('/register', ValidationMiddleware(RegisterSchema), async (req: Reque
                 avatar: null,
             },
             strikes: 0,
+            disabled: false,
             blacklisted: {
                 status: false,
                 reason: null,
@@ -284,6 +285,12 @@ router.post('/login', ValidationMiddleware(LoginSchema), async (req: Request, re
         success: false,
         error: `you are blacklisted for: ${user.blacklisted.reason}`,
     });
+
+    if (user.disabled) return res.status(401).json({
+        success: false,
+        error: 'you\'ve disabled your account',
+    });
+    
     const ipuser = await UserModel.findOne(
         {
             ips: req.realIp,

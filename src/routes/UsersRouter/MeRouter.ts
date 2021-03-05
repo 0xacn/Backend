@@ -61,10 +61,7 @@ router.post('/disable', async (req: Request, res: Response) => {
 
     try {
         await UserModel.findByIdAndUpdate(user._id, {
-            blacklisted: {
-                status: true,
-                reason: 'disabled account',
-            },
+            disabled: true,
         });
 
         await RefreshTokenModel.deleteMany({user: user._id});

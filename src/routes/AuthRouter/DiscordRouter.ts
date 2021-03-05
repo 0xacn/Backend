@@ -21,7 +21,7 @@ router.get('/login/callback', OAuthMiddleware(), async (req: Request, res: Respo
     try {
         const user = await UserModel.findOne({'discord.id': id});
 
-        if (!user || user.blacklisted.status || !user.emailVerified ) {
+        if (!user || user.blacklisted.status || !user.emailVerified || user.disabled) {
             return res.status(401).redirect(process.env.FRONTEND_URL);
         }
         const passwordReset = await PasswordResetModel.findOne({user: user._id});

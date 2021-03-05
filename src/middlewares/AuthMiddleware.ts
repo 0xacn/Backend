@@ -22,6 +22,11 @@ export default async (req: Request, res: Response, next: NextFunction) => {
         error: `you are blacklisted for: ${user.blacklisted.reason}`,
     });
 
+    if (user.blacklisted) return res.status(401).json({
+        success: false,
+        error: 'you\'ve disabled your account',
+    });
+
     req.user = user;
     next();
 };
