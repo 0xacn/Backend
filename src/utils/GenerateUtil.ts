@@ -6,9 +6,7 @@ import {randomBytes} from 'crypto';
  * @return {string} The generated string.
  */
 function generateString(length: number): string {
-    return randomBytes(length)
-        .toString('hex')
-        .slice(0, length);
+  return randomBytes(length).toString('hex').slice(0, length);
 }
 
 /**
@@ -16,9 +14,8 @@ function generateString(length: number): string {
  * @return {string} The invite code.
  */
 function generateInvite(): string {
-    const key = randomBytes(80)
-        .toString('hex');
-    return [key.slice(0, 10), key.slice(1, 12), key.slice(3, 9)].join('-');
+  const key = randomBytes(80).toString('hex');
+  return [key.slice(0, 10), key.slice(1, 12), key.slice(3, 9)].join('-');
 }
 
 /**
@@ -26,18 +23,16 @@ function generateInvite(): string {
  * @return {string} The short url.
  */
 function generateInvisibleId(): string {
-    let url = '';
-    const invisibleCharacters = ['\u200B', '\u2060', '\u200C', '\u200D'].join('');
+  let url = '';
+  const invisibleCharacters = ['\u200B', '\u2060', '\u200C', '\u200D'].join('');
 
-    for (let i = 0; i < 25; i++) {
-        url += invisibleCharacters.charAt(Math.floor(Math.random() * invisibleCharacters.length));
-    }
+  for (let i = 0; i < 25; i++) {
+    url += invisibleCharacters.charAt(
+      Math.floor(Math.random() * invisibleCharacters.length)
+    );
+  }
 
-    return url + '\u200B';
+  return url + '\u200B';
 }
 
-export {
-    generateString,
-    generateInvite,
-    generateInvisibleId
-};
+export {generateString, generateInvite, generateInvisibleId};

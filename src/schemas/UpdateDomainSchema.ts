@@ -1,10 +1,7 @@
 import {any, object, string} from 'joi';
 
 export default object({
-    domain: any()
-        .required(),
+  domain: any().required(),
 
-    subdomain: string()
-        .allow('')
-        .optional(),
+  subdomain: string().allow('').optional(),
 }).options({abortEarly: false});

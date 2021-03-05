@@ -1,12 +1,9 @@
 import {object, string} from 'joi';
 
 export default object({
-    id: string()
-        .required(),
+  id: string().required(),
 
-    reason: string()
-        .required(),
+  reason: string().required(),
 
-    executerId: string()
-        .required(),
+  executerId: string().required(),
 }).options({abortEarly: false});

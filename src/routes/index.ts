@@ -8,12 +8,12 @@ import ShortenerRouter from './ShortenerRouter';
 import AdminRouter from './AdminRouter';
 
 export {
-    FilesRouter,
-    InvitesRouter,
-    DomainsRouter,
-    AuthRouter,
-    UsersRouter,
-    BaseRouter,
-    ShortenerRouter,
-    AdminRouter
+  FilesRouter,
+  InvitesRouter,
+  DomainsRouter,
+  AuthRouter,
+  UsersRouter,
+  BaseRouter,
+  ShortenerRouter,
+  AdminRouter,
 };
