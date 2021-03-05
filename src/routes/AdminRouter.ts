@@ -513,6 +513,7 @@ router.post(
     }
   }
 );
+
 router.get('/users/:id', async (req: Request, res: Response) => {
   const {id} = req.params;
 
@@ -542,5 +543,49 @@ router.get('/users/:id', async (req: Request, res: Response) => {
     });
   }
 });
+
+router.post(
+  '/enable_user',
+  AdminMiddleware,
+  async (req: Request, res: Response) => {
+    const {id} = req.params;
+
+    try {
+      const user = await UserModel.findOne({
+        $or: [
+          {_id: id},
+          {username: {$regex: new RegExp(id, 'i')}},
+          {email: {$regex: new RegExp(id, 'i')}},
+          {invite: {$regex: new RegExp(id, 'i')}},
+          {key: {$regex: new RegExp(id, 'i')}},
+          {'discord.id': id.replace('<@!', '').replace('>', '')},
+        ],
+      });
+
+      if (!user)
+        return res.status(404).json({
+          success: false,
+          error: 'invalid user',
+        });
+
+      await UserModel.findOneAndUpdate(
+        {_id: user._id},
+        {
+          disabled: false,
+        }
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: 're-enabled user successfully',
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        error: err.message,
+      });
+    }
+  }
+);
 
 export default router;
