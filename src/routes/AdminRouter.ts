@@ -82,10 +82,10 @@ router.post(
       const user = await UserModel.findOne({
         $or: [
           {_id: id},
-          {username: {$regex: new RegExp(id, 'i')}},
-          {email: {$regex: new RegExp(id, 'i')}},
-          {invite: {$regex: new RegExp(id, 'i')}},
-          {key: {$regex: new RegExp(id, 'i')}},
+          {username: id},
+          {email: id},
+          {invite: id},
+          {key: id},
           {'discord.id': id.replace('<@!', '').replace('>', '')},
         ],
       });
@@ -150,10 +150,10 @@ router.post(
       const user = await UserModel.findOne({
         $or: [
           {_id: id},
-          {username: {$regex: new RegExp(id, 'i')}},
-          {email: {$regex: new RegExp(id, 'i')}},
-          {invite: {$regex: new RegExp(id, 'i')}},
-          {key: {$regex: new RegExp(id, 'i')}},
+          {username: id},
+          {email: id},
+          {invite: id},
+          {key: id},
           {'discord.id': id.replace('<@!', '').replace('>', '')},
         ],
       });
@@ -253,10 +253,10 @@ router.post(
       const user = await UserModel.findOne({
         $or: [
           {_id: id},
-          {username: {$regex: new RegExp(id, 'i')}},
-          {email: {$regex: new RegExp(id, 'i')}},
-          {invite: {$regex: new RegExp(id, 'i')}},
-          {key: {$regex: new RegExp(id, 'i')}},
+          {username: id},
+          {email: id},
+          {invite: id},
+          {key: id},
           {'discord.id': id.replace('<@!', '').replace('>', '')},
         ],
       });
@@ -292,10 +292,10 @@ router.post(
       const user = await UserModel.findOne({
         $or: [
           {_id: id},
-          {username: {$regex: new RegExp(id, 'i')}},
-          {email: {$regex: new RegExp(id, 'i')}},
-          {invite: {$regex: new RegExp(id, 'i')}},
-          {key: {$regex: new RegExp(id, 'i')}},
+          {username: id},
+          {email: id},
+          {invite: id},
+          {key: id},
           {'discord.id': id.replace('<@!', '').replace('>', '')},
         ],
       });
@@ -332,10 +332,10 @@ router.post(
       const user = await UserModel.findOne({
         $or: [
           {_id: id},
-          {username: {$regex: new RegExp(id, 'i')}},
-          {email: {$regex: new RegExp(id, 'i')}},
-          {invite: {$regex: new RegExp(id, 'i')}},
-          {key: {$regex: new RegExp(id, 'i')}},
+          {username: id},
+          {email: id},
+          {invite: id},
+          {key: id},
           {'discord.id': id.replace('<@!', '').replace('>', '')},
         ],
       });
@@ -370,10 +370,10 @@ router.post(
       const user = await UserModel.findOne({
         $or: [
           {_id: id},
-          {username: {$regex: new RegExp(id, 'i')}},
-          {email: {$regex: new RegExp(id, 'i')}},
-          {invite: {$regex: new RegExp(id, 'i')}},
-          {key: {$regex: new RegExp(id, 'i')}},
+          {username: id},
+          {email: id},
+          {invite: id},
+          {key: id},
           {'discord.id': id.replace('<@!', '').replace('>', '')},
         ],
       });
@@ -438,10 +438,10 @@ router.post(
       const user = await UserModel.findOne({
         $or: [
           {_id: id},
-          {username: {$regex: new RegExp(id, 'i')}},
-          {email: {$regex: new RegExp(id, 'i')}},
-          {invite: {$regex: new RegExp(id, 'i')}},
-          {key: {$regex: new RegExp(id, 'i')}},
+          {username: id},
+          {email: id},
+          {invite: id},
+          {key: id},
           {'discord.id': id.replace('<@!', '').replace('>', '')},
         ],
       });
@@ -481,10 +481,10 @@ router.post(
       const user = await UserModel.findOne({
         $or: [
           {_id: id},
-          {username: {$regex: new RegExp(id, 'i')}},
-          {email: {$regex: new RegExp(id, 'i')}},
-          {invite: {$regex: new RegExp(id, 'i')}},
-          {key: {$regex: new RegExp(id, 'i')}},
+          {username: id},
+          {email: id},
+          {invite: id},
+          {key: id},
           {'discord.id': id.replace('<@!', '').replace('>', '')},
         ],
       });
@@ -518,14 +518,16 @@ router.get('/users/:id', async (req: Request, res: Response) => {
   const {id} = req.params;
 
   try {
-    const user =
-      (await UserModel.find({_id: id})) ||
-      (await UserModel.find({invite: id})) ||
-      (await UserModel.find({username: {$regex: new RegExp(id, 'i')}})) ||
-      (await UserModel.find({
-        'discord.id': id.replace('<@!', '').replace('>', ''),
-      })) ||
-      (await UserModel.find({uid: parseInt(id) || null}));
+    const user = await UserModel.find({
+        $or: [
+          {_id: id},
+          {username: id},
+          {invite: id},
+          {key: id},
+          {'discord.id': id.replace('<@!', '').replace('>', '')},
+		  { uid: parseInt(id) || null },
+        ],
+      });
 
     if (!user)
       return res.status(404).json({
@@ -554,10 +556,10 @@ router.post(
       const user = await UserModel.findOne({
         $or: [
           {_id: id},
-          {username: {$regex: new RegExp(id, 'i')}},
-          {email: {$regex: new RegExp(id, 'i')}},
-          {invite: {$regex: new RegExp(id, 'i')}},
-          {key: {$regex: new RegExp(id, 'i')}},
+          {username: id},
+          {email: id},
+          {invite: id},
+          {key: id},
           {'discord.id': id.replace('<@!', '').replace('>', '')},
         ],
       });
